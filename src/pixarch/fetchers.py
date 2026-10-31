@@ -19,7 +19,8 @@ UA = "pixarch-research/0.1 (academic on-device retrieval research)"
 
 SCENE_CLASSES = [
     "beach", "mountain", "trees", "vehicle", "party", "wedding",
-    "college", "food", "travel", "fitness", "mall", "selfie",
+    "college", "food", "travel", "fitness", "mall", "planes",
+    "outdoor_games", "clothes", "art", "transit_hub", "xray",
 ]
 
 # Openverse query strings tuned per class -- the bare class name is a poor
@@ -37,6 +38,12 @@ SCENE_QUERIES = {
     "fitness": "gym fitness workout",
     "mall": "shopping mall interior",
     "selfie": "selfie portrait person",
+    "planes": "airplane runway aircraft",
+    "outdoor_games": "sports field players outdoor game",
+    "clothes": "clothing store garments rack",
+    "art": "art gallery paintings exhibition",
+    "transit_hub": "railway station platform train",
+    "xray": "chest radiograph x-ray",
 }
 
 # Wikimedia Commons identity-document specimens. Small and hand-picked: these
@@ -267,9 +274,8 @@ def fetch_receipts_hf(raw_dir: Path, n: int = 20, gt_path: Path | None = None) -
             notes="has OCR ground truth upstream",
         ))
     if gt_path is not None and gt_lines:
-        gt_path.parent.mkdir(parents=True, exist_ok=True)
-        gt_path.write_text("\n".join(gt_lines) + "\n", encoding="utf-8")
-        print(f"  ocr ground truth -> {gt_path} ({len(gt_lines)} receipts)")
+        # Merge, never truncate: other fetchers write to the same file.
+        _merge_gt(gt_path, [json.loads(ln) for ln in gt_lines])
     print(f"  documents/receipt  {len(records):3d}  (SROIE)")
     return records
 
@@ -308,13 +314,20 @@ SUN397_LABELS = {
     "beach": 46,
     "mountain": 244,
     "trees": 159,          # forest broadleaf
-    "vehicle": 268,        # parking lot
+    "vehicle": 268,        # parking lot -- absorbs the "cars" request
     "party": 134,          # discotheque
+    "wedding": 297,        # reception
     "college": 73,         # campus
     "food": 158,           # food court
     "travel": 265,         # park
     "fitness": 177,        # gymnasium indoor
-    "mall": 319,           # shopping mall indoor
+    "mall": 319,           # shopping mall indoor -- absorbs the "shops" request
+    "planes": 309,         # runway
+    "outdoor_games": 19,   # athletic field outdoor
+    "clothes": 101,        # clothing store
+    "art": 15,             # art gallery
+    "transit_hub": 362,    # train station platform
+    # "xray" has no SUN397 equivalent -- see fetch_xray_hf().
 }
 
 _DS_SERVER = "https://datasets-server.huggingface.co"
@@ -428,4 +441,345 @@ def fetch_scenes_sun397(
             ))
             kept += 1
         print(f"  scenes/{cls:9} {kept:3d}/{per_class}")
+    return records
+
+
+# ------------------------------------------------- HuggingFace generic pull --
+def _hf_rows(dataset: str, config: str, split: str, offset: int, length: int) -> dict:
+    """One page from the datasets-server `rows` endpoint.
+
+    Used instead of `datasets.load_dataset(streaming=True)` because several of
+    these repos have the dataset viewer enabled but streaming gated, and the
+    HTTP endpoint is the one that is actually reachable for all of them.
+    """
+    qs = urllib.parse.urlencode(
+        {"dataset": dataset, "config": config, "split": split,
+         "offset": offset, "length": length}
+    )
+    return _get_json(f"{_DS_SERVER}/rows?{qs}", timeout=60)
+
+
+def _hf_rows_paged(dataset: str, config: str, split: str, total: int,
+                   page: int = 100) -> list[dict]:
+    """Collect `total` rows across pages.
+
+    The datasets-server caps `length` at 100 and returns an error -- not a
+    truncated page -- for anything larger, so a single large request silently
+    yields nothing.
+    """
+    rows: list[dict] = []
+    offset = 0
+    while len(rows) < total:
+        want = min(page, total - len(rows))
+        try:
+            batch = _hf_rows(dataset, config, split, offset, want)
+        except RuntimeError:
+            break
+        got = batch.get("rows", [])
+        if not got:
+            break
+        rows.extend(got)
+        offset += len(got)
+    return rows
+
+
+def _merge_gt(gt_path: Path, lines: list[dict]) -> None:
+    """Append OCR ground truth, replacing rows with the same item_id.
+
+    Mirrors write_manifest's merge contract: a fetcher that runs for only one
+    subtype must not destroy ground truth another fetcher already wrote.
+    """
+    if not lines:
+        return
+    existing: list[dict] = []
+    if gt_path.exists():
+        for ln in gt_path.read_text(encoding="utf-8").splitlines():
+            if ln.strip():
+                try:
+                    existing.append(json.loads(ln))
+                except json.JSONDecodeError:
+                    continue
+    new_ids = {d["item_id"] for d in lines}
+    merged = [d for d in existing if d.get("item_id") not in new_ids] + lines
+    gt_path.parent.mkdir(parents=True, exist_ok=True)
+    gt_path.write_text(
+        "\n".join(json.dumps(d, ensure_ascii=False) for d in merged) + "\n",
+        encoding="utf-8",
+    )
+    print(f"  ocr ground truth -> {gt_path} ({len(merged)} rows, +{len(lines)})")
+
+
+# Real-document sources. `text_fn` pulls OCR ground truth out of the row where
+# the upstream dataset ships it -- free CER/WER evaluation, no annotation.
+HF_DOC_SOURCES = {
+    "bill": dict(
+        dataset="katanaml-org/invoices-donut-data-v1", config="default", split="train",
+        license="CC-BY-4.0", attribution="katanaml-org invoices-donut-data-v1",
+        text_fn=lambda r: " ".join(
+            str(v) for v in _flatten_json(r.get("ground_truth") or "")
+        ),
+    ),
+    "general_doc": dict(
+        dataset="nielsr/funsd", config="default", split="train",
+        license="FUNSD research use", attribution="FUNSD (Jaume et al., ICDAR 2019)",
+        text_fn=lambda r: " ".join(r.get("words") or []),
+    ),
+}
+
+
+def _flatten_json(blob):
+    """Yield every scalar in a nested JSON string/dict -- invoice GT is nested."""
+    if isinstance(blob, str):
+        try:
+            blob = json.loads(blob)
+        except json.JSONDecodeError:
+            return [blob]
+    out = []
+    stack = [blob]
+    while stack:
+        cur = stack.pop()
+        if isinstance(cur, dict):
+            stack.extend(cur.values())
+        elif isinstance(cur, list):
+            stack.extend(cur)
+        elif cur is not None:
+            out.append(cur)
+    return out
+
+
+def fetch_docs_hf(raw_dir: Path, n: int = 20, gt_path: Path | None = None,
+                  subtypes=None) -> list[Record]:
+    """Real (non-identity) documents: bills, handwriting, generic forms."""
+    records: list[Record] = []
+    gt_lines: list[dict] = []
+    for subtype in (subtypes or HF_DOC_SOURCES):
+        spec = HF_DOC_SOURCES[subtype]
+        try:
+            batch = _hf_rows(spec["dataset"], spec["config"], spec["split"], 0, n * 2)
+        except RuntimeError as e:
+            print(f"  ! documents/{subtype}: {e}; skipping")
+            continue
+        kept = 0
+        for row in batch.get("rows", []):
+            if kept >= n:
+                break
+            payload = row["row"]
+            img = payload.get("image")
+            src = img.get("src") if isinstance(img, dict) else None
+            if not src:
+                continue
+            item_id = f"doc_{subtype}_{kept:03d}"
+            dest = raw_dir / "documents" / subtype / f"{item_id}.jpg"
+            try:
+                blob = _get(src, tries=3, timeout=40)
+            except RuntimeError:
+                continue
+            if len(blob) < 2_000:
+                continue
+            _save(blob, dest)
+            text = (spec["text_fn"](payload) or "").strip()
+            if text:
+                gt_lines.append({"item_id": item_id, "text": text,
+                                 "source": spec["dataset"]})
+            records.append(Record(
+                item_id=item_id,
+                path=str(dest.relative_to(raw_dir)),
+                bucket="document",
+                subtype=subtype,
+                source_url=f"https://huggingface.co/datasets/{spec['dataset']}",
+                license=spec["license"],
+                attribution=spec["attribution"],
+                notes="has OCR ground truth upstream" if text else "",
+            ))
+            kept += 1
+        print(f"  documents/{subtype:12} {kept:3d}/{n}")
+    if gt_path is not None:
+        _merge_gt(gt_path, gt_lines)
+    return records
+
+
+def fetch_xray_hf(raw_dir: Path, n: int = 20) -> list[Record]:
+    """Chest radiographs. No SUN397 equivalent, so this is its own source.
+
+    Kept in the *scene* bucket per the category list: an x-ray carries no
+    OCR-able prose, so routing it to the document branch would be a bug -- and
+    that makes it a useful adversarial case for the classifier.
+    """
+    spec = dict(dataset="keremberke/chest-xray-classification", config="full", split="train")
+    try:
+        batch = _hf_rows(spec["dataset"], spec["config"], spec["split"], 0, n * 2)
+    except RuntimeError as e:
+        print(f"  ! scenes/xray: {e}; skipping")
+        return []
+    records, kept = [], 0
+    for row in batch.get("rows", []):
+        if kept >= n:
+            break
+        img = row["row"].get("image")
+        src = img.get("src") if isinstance(img, dict) else None
+        if not src:
+            continue
+        item_id = f"scn_xray_{kept:03d}"
+        dest = raw_dir / "scenes" / "xray" / f"{item_id}.jpg"
+        try:
+            blob = _get(src, tries=3, timeout=40)
+        except RuntimeError:
+            continue
+        if len(blob) < 2_000:
+            continue
+        _save(blob, dest)
+        records.append(Record(
+            item_id=item_id, path=str(dest.relative_to(raw_dir)),
+            bucket="scene", subtype="xray",
+            source_url=f"https://huggingface.co/datasets/{spec['dataset']}",
+            license="CC-BY-4.0", attribution="keremberke/chest-xray-classification",
+        ))
+        kept += 1
+    print(f"  scenes/xray       {kept:3d}/{n}")
+    return records
+
+
+def fetch_commons_books(raw_dir: Path, n: int = 20) -> list[Record]:
+    """Scanned book title/copyright pages from Wikimedia Commons.
+
+    HuggingFace's book-cover datasets are all gated (401), and a *cover* is a
+    poor document anyway -- the `book` doctype rule keys on isbn/chapter/
+    copyright, which live on the title and copyright pages, not the cover.
+    """
+    queries = ["book title page scan", "book copyright page",
+               "title page 1900 book", "frontispiece title page"]
+    seen: set[str] = set()
+    titles: list[str] = []
+    for q in queries:
+        if len(titles) >= n * 2:
+            break
+        api = "https://commons.wikimedia.org/w/api.php?" + urllib.parse.urlencode({
+            "action": "query", "format": "json", "list": "search",
+            "srsearch": q, "srnamespace": 6, "srlimit": 30,
+        })
+        try:
+            hits = _get_json(api, timeout=40).get("query", {}).get("search", [])
+        except RuntimeError as e:
+            print(f"  ! commons books ({q}): {e}")
+            continue
+        for h in hits:
+            t = h["title"]
+            if t.lower().endswith((".jpg", ".jpeg", ".png", ".tif", ".tiff")) and t not in seen:
+                seen.add(t)
+                titles.append(t)
+
+    records, kept = [], 0
+    for title in titles:
+        if kept >= n:
+            break
+        api = "https://commons.wikimedia.org/w/api.php?" + urllib.parse.urlencode({
+            "action": "query", "format": "json", "prop": "imageinfo",
+            "iiprop": "url|extmetadata", "iiurlwidth": 1400, "titles": title,
+        })
+        try:
+            pages = _get_json(api, timeout=40)["query"]["pages"]
+            info = next(iter(pages.values()))["imageinfo"][0]
+        except (RuntimeError, KeyError, StopIteration, IndexError):
+            continue
+        url = info.get("thumburl") or info.get("url")
+        meta = info.get("extmetadata", {})
+        item_id = f"doc_book_{kept:03d}"
+        dest = raw_dir / "documents" / "book" / f"{item_id}.jpg"
+        try:
+            blob = _get(url, tries=3, timeout=40)
+        except RuntimeError:
+            continue
+        if len(blob) < 5_000:
+            continue
+        _save(blob, dest)
+        records.append(Record(
+            item_id=item_id, path=str(dest.relative_to(raw_dir)),
+            bucket="document", subtype="book",
+            source_url=f"https://commons.wikimedia.org/wiki/{urllib.parse.quote(title)}",
+            license=meta.get("LicenseShortName", {}).get("value", "see source"),
+            attribution=meta.get("Artist", {}).get("value", "Wikimedia Commons"),
+        ))
+        kept += 1
+    print(f"  documents/book    {kept:3d}/{n}")
+    return records
+
+
+def fetch_handwritten_pages(raw_dir: Path, n: int = 20, gt_path: Path | None = None,
+                            lines_per_page: int = 9) -> list[Record]:
+    """Compose handwritten *note pages* from real IAM handwriting lines.
+
+    Every page-level handwriting dataset on the hub is gated (401); only
+    line-level ones are reachable. A raw IAM line is ~2467x128 -- a 19:1 strip
+    that is neither a note a user would photograph nor anything CLIP can route
+    sensibly. So the pixels are real IAM handwriting and only the page layout
+    is ours, which also yields exact ground truth: the concatenated line texts.
+    """
+    from PIL import Image
+    import io, random
+
+    ds = "gagan3012/IAM"
+    need = n * lines_per_page
+    all_rows = _hf_rows_paged(ds, "default", "train", need * 2)
+    if not all_rows:
+        print("  ! documents/handwritten: no rows from datasets-server; skipping")
+        return []
+
+    pool = []
+    for row in all_rows:
+        payload = row["row"]
+        img = payload.get("image")
+        src = img.get("src") if isinstance(img, dict) else None
+        txt = (payload.get("text") or "").strip()
+        if src and txt:
+            pool.append((src, txt))
+
+    rng = random.Random(0)          # deterministic: the corpus must rebuild identically
+    records, gt_lines = [], []
+    MARGIN, GAP, PAGE_W = 90, 34, 1700
+
+    for idx in range(n):
+        chunk = pool[idx * lines_per_page:(idx + 1) * lines_per_page]
+        if len(chunk) < 3:
+            break
+        crops, texts = [], []
+        for src, txt in chunk:
+            try:
+                blob = _get(src, tries=2, timeout=40)
+            except RuntimeError:
+                continue
+            try:
+                im = Image.open(io.BytesIO(blob)).convert("L")
+            except Exception:                                  # noqa: BLE001
+                continue
+            avail = PAGE_W - 2 * MARGIN
+            if im.width > avail:
+                im = im.resize((avail, max(1, int(im.height * avail / im.width))), Image.LANCZOS)
+            crops.append(im)
+            texts.append(txt)
+        if len(crops) < 3:
+            continue
+
+        page_h = 2 * MARGIN + sum(c.height for c in crops) + GAP * (len(crops) - 1)
+        page = Image.new("L", (PAGE_W, page_h), 255)
+        y = MARGIN
+        for c in crops:
+            page.paste(c, (MARGIN + rng.randint(0, 25), y))     # ragged left edge
+            y += c.height + GAP
+
+        item_id = f"doc_handwritten_{idx:03d}"
+        dest = raw_dir / "documents" / "handwritten" / f"{item_id}.jpg"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        page.convert("RGB").save(dest, quality=92)
+        gt_lines.append({"item_id": item_id, "text": " ".join(texts), "source": ds})
+        records.append(Record(
+            item_id=item_id, path=str(dest.relative_to(raw_dir)),
+            bucket="document", subtype="handwritten",
+            source_url=f"https://huggingface.co/datasets/{ds}",
+            license="IAM Handwriting DB -- research use",
+            attribution="IAM Handwriting Database (Marti & Bunke, 2002)",
+            notes="real IAM handwriting lines composed into a page; OCR GT upstream",
+        ))
+    if gt_path is not None:
+        _merge_gt(gt_path, gt_lines)
+    print(f"  documents/handwritten {len(records):3d}/{n}  (composed from real IAM lines)")
     return records

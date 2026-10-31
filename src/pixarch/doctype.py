@@ -47,6 +47,30 @@ RULES: tuple[Rule, ...] = (
          all_of=()),
     Rule("receipt", "receipt-tax", weight=3,
          any_of=("gst", "tax invoice", "invoice no", "receipt no", "bill no")),
+    # Payment cards. "credit card"/"debit card" are matched as whole phrases:
+    # the bare token "card" appears on loyalty receipts ("Shell Loyalty Card")
+    # and on every ID card, so it is useless as a discriminator.
+    Rule("credit_card", "credit-card-phrase", weight=3, any_of=("credit card",)),
+    Rule("debit_card", "debit-card-phrase", weight=3, any_of=("debit card",)),
+    Rule("credit_card", "card-face", weight=1,
+         all_of=("valid thru",), any_of=("cardholder", "card holder")),
+
+    # Bank records. Weight 3 so they outrank `receipt-total`, which otherwise
+    # fires on any statement carrying the word "total".
+    Rule("passbook", "passbook-keyword", weight=3,
+         any_of=("passbook", "pass book", "savings bank account")),
+    Rule("bank_statement", "statement-header", weight=3,
+         any_of=("statement of account", "account statement",
+                 "opening balance", "closing balance")),
+    Rule("bank_statement", "statement-columns", weight=2,
+         all_of=("debit", "credit"), any_of=("balance",)),
+
+    # School report cards. Also weight 3: a report card has a "Total" row and
+    # was being tagged `receipt` by receipt-total before this rule existed.
+    Rule("report_card", "report-card-phrase", weight=3,
+         any_of=("report card", "progress report", "marks obtained",
+                 "academic session")),
+
     # "account number" and "due date" are deliberately NOT here. PAN stands for
     # "Permanent Account Number", so a blank PAN template whose only legible
     # text is its field labels was being tagged `bill`; "due date" appears on

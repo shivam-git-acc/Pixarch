@@ -1,0 +1,164 @@
+[
+  {
+    "filename": "doc_receipt_000.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "tan woon yann Book TA _k (TAMAN DAYA) SDN BHD TAMAN DAYA; JOHOR Doctment Ijo TDO[16/10 Dale 25/12/2018 8 13,39 PM Casher MANIS Menier CASH BILL PKICE Rt FM PC Q0 9,O Total UO Rout 0,90 Round d Total (RM): 9.00 Cash XUO CHANGE 0o 9.00 FXC HANGEABLE jing",
+    "corrected_text": "tan woon yann Book TA _k (TAMAN DAYA) SDN BHD TAMAN DAYA; JOHOR Doctment Ijo TDO[16/10 Dale 25/12/2018 8 13,39 PM Casher MANIS Menier CASH BILL PKICE Rt FM PC Q0 9,O Total UO Rout 0,90 Round d Total (RM): 9.00 Cash XUO CHANGE 0o 9.00 FXC HANGEABLE jing",
+    "token_count": 49
+  },
+  {
+    "filename": "doc_receipt_001.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "tan woon yann & HOME  DECO 27,JALAN DEDAP 1J4 81i00 JOHOR BAHRU, JOHOR. Tel 07-3507405 Fax;07-3558160 RECEIPT 19/10/2018 Cashier; CN Location/SP: 05 /0531 MB; N026588 Ropm No; 01 050100035279 Desc /Item Qty Frice Ant(RH) ST-PRIVILEGE CARD/OD INDAH 88888 GF-TABLE LAMP/STITCH <i> 62483 55,90 @DISC -5,59 #Total Qty RH 60,31 RQUNDING  AdJ ~0,04 RH 60,30 Cash. RH 70.30 CHANGE_ RH Thank You Please Come Again Goods Sold Are Not Returnable Dealing In Wholesale And Retail",
+    "corrected_text": "tan woon yann & HOME  DECO 27,JALAN DEDAP 1J4 81i00 JOHOR BAHRU, JOHOR. Tel 07-3507405 Fax;07-3558160 RECEIPT 19/10/2018 Cashier; CN Location/SP: 05 /0531 MB; N026588 Ropm No; 01 050100035279 Desc /Item Qty Frice Ant(RH) ST-PRIVILEGE CARD/OD INDAH 88888 GF-TABLE LAMP/STITCH <i> 62483 55,90 @DISC -5,59 #Total Qty RH 60,31 RQUNDING  AdJ ~0,04 RH 60,30 Cash. RH 70.30 CHANGE_ RH Thank You Please Come Again Goods Sold Are Not Returnable Dealing In Wholesale And Retail",
+    "token_count": 74
+  },
+  {
+    "filename": "doc_receipt_002.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "tan woon yann MR 0.I.Y JohuR) SDN BHD (CO,REC 933109-X ) JALAN KPB Kawasan PERINDUSTRIAN BALAKONG 43300 SERI KEMBANGAN, SELANGOR TERBAU ) INVOICE - 24 8970669 x 19.00 19.00 AIR PRESSUPE SPRAYER SX-575-1 1.5L HC03-7 15 9066468 8.02 8 . 02 Wa14-3A 48 9557031100236 3 . 02 3 ,02 BOPP  TAPE 48MM+1oom CLEAR FZ-04 36 69358 18350846 1 X 3 , 48 3,88 Item(s Oty(s) RM 33 , 92 ROUNDING  ADJUSTMEM -RM 0.02 33.f0 RM 33.90 RM 50.0u CHANGE RM 16 .10 12-01-19 21:13 ShOi Zk0g T4 Ro00o27830 OPERATOR TRAINEE CASHIER EXCHANGE ARE  ALLOWED Within DAYS WITH RECEIPT STRICTLY NO Cash REFUND ,",
+    "corrected_text": "tan woon yann MR 0.I.Y JohuR) SDN BHD (CO,REC 933109-X ) JALAN KPB Kawasan PERINDUSTRIAN BALAKONG 43300 SERI KEMBANGAN, SELANGOR TERBAU ) INVOICE - 24 8970669 x 19.00 19.00 AIR PRESSUPE SPRAYER SX-575-1 1.5L HC03-7 15 9066468 8.02 8 . 02 Wa14-3A 48 9557031100236 3 . 02 3 ,02 BOPP  TAPE 48MM+1oom CLEAR FZ-04 36 69358 18350846 1 X 3 , 48 3,88 Item(s Oty(s) RM 33 , 92 ROUNDING  ADJUSTMEM -RM 0.02 33.f0 RM 33.90 RM 50.0u CHANGE RM 16 .10 12-01-19 21:13 ShOi Zk0g T4 Ro00o27830 OPERATOR TRAINEE CASHIER EXCHANGE ARE  ALLOWED Within DAYS WITH RECEIPT STRICTLY NO Cash REFUND ,",
+    "token_count": 103
+  },
+  {
+    "filename": "doc_receipt_003.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "tan woon yann YONGFATT ENTERPRISE No12124 JALAN DEDAP I3 81100 JOHIOR EAHIRU TEL 07-1523888 GST ID 0008+198135014 SIMPLIFIED TAX INVOICE CASH 0500031663 Dale ( as\" USER 123100 Rel; Qiy SPice Amoun Taz \"318 80 91 SR Total ONy\" 80 91 Total Sales (Excluding GST; 60 Ji Discolint On Toldl GST 0o Rourding J01 80. 90 CASH 100.00 Change 19,10 GST SUMMARY Tax Code Tax (RMj SR 80 91 Total 80,91 0,0q",
+    "corrected_text": "tan woon yann YONGFATT ENTERPRISE No12124 JALAN DEDAP I3 81100 JOHIOR EAHIRU TEL 07-1523888 GST ID 0008+198135014 SIMPLIFIED TAX INVOICE CASH 0500031663 Dale ( as\" USER 123100 Rel; Qiy SPice Amoun Taz \"318 80 91 SR Total ONy\" 80 91 Total Sales (Excluding GST; 60 Ji Discolint On Toldl GST 0o Rourding J01 80. 90 CASH 100.00 Change 19,10 GST SUMMARY Tax Code Tax (RMj SR 80 91 Total 80,91 0,0q",
+    "token_count": 71
+  },
+  {
+    "filename": "doc_receipt_004.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "tan woon yann Mk Suw Biid 86267 |-D) 185 ~0 6 , SELANGOR TESCO  PUTRA  NILAT ) 12 9561416500133 J. W644 122 02 4 . 62 Muu 257? 724 07956700u084 23 112 3 15 455365/400385 7.45 7,45 6/306 9090822 50 ,50 em ( & ) 5 Tata RM 30 RM Tutal Roundfd RM 30, 90 CASt RM 20 , |0 18-1118 L[5J UPEF ATOR",
+    "corrected_text": "tan woon yann Mk Suw Biid 86267 |-D) 185 ~0 6 , SELANGOR TESCO  PUTRA  NILAT ) 12 9561416500133 J. W644 122 02 4 . 62 Muu 257? 724 07956700u084 23 112 3 15 455365/400385 7.45 7,45 6/306 9090822 50 ,50 em ( & ) 5 Tata RM 30 RM Tutal Roundfd RM 30, 90 CASt RM 20 , |0 18-1118 L[5J UPEF ATOR",
+    "token_count": 64
+  },
+  {
+    "filename": "doc_receipt_005.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "tan yee ABC HO TRADING: No,284,JALAN HARMONI 3/2 , TAMAN DESA HARMONI, 81100 JOHOR BAHRU JOHOk 07-355 2616 Cash Bill 01-143008 Date 09/01/2019 8;01;11 PM Cashier 01 Desctiption Price Amount RM RM 15.50 31.00 otul 31 00 Total Amount: 31.00 Cash Received 701 00 Change 70.00 ~Goods Sold are nor-refundable #rPlease Come Again\"^* 31.00 chay",
+    "corrected_text": "tan yee ABC HO TRADING: No,284,JALAN HARMONI 3/2 , TAMAN DESA HARMONI, 81100 JOHOR BAHRU JOHOk 07-355 2616 Cash Bill 01-143008 Date 09/01/2019 8;01;11 PM Cashier 01 Desctiption Price Amount RM RM 15.50 31.00 otul 31 00 Total Amount: 31.00 Cash Received 701 00 Change 70.00 ~Goods Sold are nor-refundable #rPlease Come Again\"^* 31.00 chay",
+    "token_count": 55
+  },
+  {
+    "filename": "doc_receipt_006.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "tan chay yee SOON HUAT MACHINERY ENTERPRISE (JM0352019-ki NO.53 JALAN PUTRA 1 TAMAN SRI PUTRA, 81200 JOHOR BAHRU JOHOR TEL 07-56,47360 /016-7993391 FAX : 07-5624059 SOONHUATZOOO@HOTMAIL CoM GST ID 002116837376 CASH SALES Doc No CS00004040 Date: 11/01/2019 Cashier USER Time 09 44.00 Salesperson Ref. Item Qty SPrice SiPrice Amount Tax 1072 80.00 80 00 80,@0 REPAIR ENGINE POWER SPRAYER (1UNIT) workmanship & service 70549 160.00 160.00 160.Q0 GIANT 606 OVERFLOW ASSY 1071 1/ JU 17.00 17.00 ENGINE OIL 70791 10 00 10 00 10.00 GREASE FOR TOOLS 40ML (AKODA) 70637 6,00 EY20 PLUG CHAMPION 1643 8 00 8,0D 8,00 STARTER TALI 70197 10.00 10 00 10.00 EY20 STARTER HANDLE 70561 18,00 18,00 36,00 HD40 IL COTIN Total Qty 327 00 Tolal Sales 327.00 Discount 327.00 Total 0,00 Rounding 0,00 Total Sales 327.00 CASH 327.00 Change 0.00 GOODS SOLD ARE NOT RETURNABLE THANK YOU.",
+    "corrected_text": "tan chay yee SOON HUAT MACHINERY ENTERPRISE (JM0352019-ki NO.53 JALAN PUTRA 1 TAMAN SRI PUTRA, 81200 JOHOR BAHRU JOHOR TEL 07-56,47360 /016-7993391 FAX : 07-5624059 SOONHUATZOOO@HOTMAIL CoM GST ID 002116837376 CASH SALES Doc No CS00004040 Date: 11/01/2019 Cashier USER Time 09 44.00 Salesperson Ref. Item Qty SPrice SiPrice Amount Tax 1072 80.00 80 00 80,@0 REPAIR ENGINE POWER SPRAYER (1UNIT) workmanship & service 70549 160.00 160.00 160.Q0 GIANT 606 OVERFLOW ASSY 1071 1/ JU 17.00 17.00 ENGINE OIL 70791 10 00 10 00 10.00 GREASE FOR TOOLS 40ML (AKODA) 70637 6,00 EY20 PLUG CHAMPION 1643 8 00 8,0D 8,00 STARTER TALI 70197 10.00 10 00 10.00 EY20 STARTER HANDLE 70561 18,00 18,00 36,00 HD40 IL COTIN Total Qty 327 00 Tolal Sales 327.00 Discount 327.00 Total 0,00 Rounding 0,00 Total Sales 327.00 CASH 327.00 Change 0.00 GOODS SOLD ARE NOT RETURNABLE THANK YOU.",
+    "token_count": 143
+  },
+  {
+    "filename": "doc_receipt_007.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "tan yee 801580-T No , 343, Jalan Kurau, Sunga1 Rengit 81620 Pengerang Johor Tel : 07-8263254 Fax; 07-8266888 INVOICE ITEM/DESC . QTY U.PRICE RM(TOTAL ) 4132 20,00 20,00 CROCS 300x17  TUBES SUB   TOTAL 20,00 ROUNDING   ADJUSTMENT 0.00 GRAND   TOTAL 20.00 CASH 20,00 CHANGE 0.00 23-01-2019 13;14:15 PM , PRINT BY : root TOKEN NO: 0 , STATION ID: 41, PID: POS INVOICE NO; 22497 Thanks Your Support chay",
+    "corrected_text": "tan yee 801580-T No , 343, Jalan Kurau, Sunga1 Rengit 81620 Pengerang Johor Tel : 07-8263254 Fax; 07-8266888 INVOICE ITEM/DESC . QTY U.PRICE RM(TOTAL ) 4132 20,00 20,00 CROCS 300x17  TUBES SUB   TOTAL 20,00 ROUNDING   ADJUSTMENT 0.00 GRAND   TOTAL 20.00 CASH 20,00 CHANGE 0.00 23-01-2019 13;14:15 PM , PRINT BY : root TOKEN NO: 0 , STATION ID: 41, PID: POS INVOICE NO; 22497 Thanks Your Support chay",
+    "token_count": 68
+  },
+  {
+    "filename": "doc_receipt_008.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "PERNIAGAAN ZHENG KUI JMo325955-V NO.59 JALAN PERMAS 9/5 BANDAR BARU PERMAS JAYA 81760 JOHOR BAHRU TEL 07-386 7524 FAX 07-386 3793 GST NO ; 000800589824 SIMPLIFIED TAX INVOICE GOGIANT ENGINEERING (M} SDN BHD Rezelpt# Cs00082582 Salespeisot: Data: 12802/2018 Cashier: USER 08,300 (RM) (RM: Itari RSF 8239 16,00 SR: 11\" PROINESS HIDUTY EILICONE GN G-DZ 9565075109147 GA 7.00 21,0C SR: XTRASEAL RTV ACETIC SILICONE S4-107 9744 61 T8.D0 1B.0C 5R: CENTRAL PUNCH SET 3PCS_ 1/4\",5/32\".1/4\" 12525 50,00 50.0C SR,24\" MARKSMAN PIPE WRENCH 2016 Gh 0.70 2IC SR: PVC WIRE TAFE IPC X 7YD TOTQT 7T06.1c (Excluded GST) Sub Total (RM) 106.10 Discount (RM} D,QQ Total GST (RM) Roundlng (RM} -0.02 Total (RM) 112,46 CASH 112.48 Change (RM) 0,00 GST GUMMARY Tax Code Amount GST SR 06.10 8,37 Total 106,10 6.37 GOODS 5OLD ARE NOT RETURNABLE THANK YOU. Tlme\"",
+    "corrected_text": "PERNIAGAAN ZHENG KUI JMo325955-V NO.59 JALAN PERMAS 9/5 BANDAR BARU PERMAS JAYA 81760 JOHOR BAHRU TEL 07-386 7524 FAX 07-386 3793 GST NO ; 000800589824 SIMPLIFIED TAX INVOICE GOGIANT ENGINEERING (M} SDN BHD Rezelpt# Cs00082582 Salespeisot: Data: 12802/2018 Cashier: USER 08,300 (RM) (RM: Itari RSF 8239 16,00 SR: 11\" PROINESS HIDUTY EILICONE GN G-DZ 9565075109147 GA 7.00 21,0C SR: XTRASEAL RTV ACETIC SILICONE S4-107 9744 61 T8.D0 1B.0C 5R: CENTRAL PUNCH SET 3PCS_ 1/4\",5/32\".1/4\" 12525 50,00 50.0C SR,24\" MARKSMAN PIPE WRENCH 2016 Gh 0.70 2IC SR: PVC WIRE TAFE IPC X 7YD TOTQT 7T06.1c (Excluded GST) Sub Total (RM) 106.10 Discount (RM} D,QQ Total GST (RM) Roundlng (RM} -0.02 Total (RM) 112,46 CASH 112.48 Change (RM) 0,00 GST GUMMARY Tax Code Amount GST SR 06.10 8,37 Total 106,10 6.37 GOODS 5OLD ARE NOT RETURNABLE THANK YOU. Tlme\"",
+    "token_count": 137
+  },
+  {
+    "filename": "doc_receipt_009.jpg",
+    "is_identical": false,
+    "fixes": {
+      "('formerIy', 'formerly')": 1
+    },
+    "original_raw_text": "1950 Gerbang Alaf Restaurants Sdn Bhd (65351-M) formerIy known as GoIden Arches Restaurants Sdn Biid Licensee of McuonaId'€ Level 6, Bangunan TH , Damansara Uptown3 No.3, Jalan SS21/39,47400 Petaling Jaya Selangor (GST ID No: 000504664064) McDonald's BHP Taman Melawat i ( #328) Te] No _ 03-4162-2318 TaX INV ICE MFY Side 1 Inv# 003281900229170 ORD #50 ~REG #19-  18/01/2018 10:27:03 QTY ITEM TOTAL 2 ChicMcMuffin 11.00 M Porridge 5,60 BM 2HotCakes 10.00 L Coke Takelut Total inc] GST) 26.60 Tota] Rounded 26.60 Cash Tendered 820 . 00 Change 73,40 TOTAL INCLUDES 6x GST 1,51 We 'd Iove to hear your feedbeck . sit WWW mcdfeedback . COM , Mly OR Download My McD Feedback from Google Play /App Store to share your experience Thank You and Please Come Again. Customer Service Hot] ine 03-2726-5600 Jec 0598",
+    "corrected_text": "1950 Gerbang Alaf Restaurants Sdn Bhd (65351-M) formerly known as GoIden Arches Restaurants Sdn Biid Licensee of McuonaId'€ Level 6, Bangunan TH , Damansara Uptown3 No.3, Jalan SS21/39,47400 Petaling Jaya Selangor (GST ID No: 000504664064) McDonald's BHP Taman Melawat i ( #328) Te] No _ 03-4162-2318 TaX INV ICE MFY Side 1 Inv# 003281900229170 ORD #50 ~REG #19-  18/01/2018 10:27:03 QTY ITEM TOTAL 2 ChicMcMuffin 11.00 M Porridge 5,60 BM 2HotCakes 10.00 L Coke Takelut Total inc] GST) 26.60 Tota] Rounded 26.60 Cash Tendered 820 . 00 Change 73,40 TOTAL INCLUDES 6x GST 1,51 We 'd Iove to hear your feedbeck . sit WWW mcdfeedback . COM , Mly OR Download My McD Feedback from Google Play /App Store to share your experience Thank You and Please Come Again. Customer Service Hot] ine 03-2726-5600 Jec 0598",
+    "token_count": 136
+  },
+  {
+    "filename": "doc_receipt_010.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "SAM SAM TRADING co (742016-W) 67,JLN MEWAH 25/63 TmN SRI MUDA, 40400 Shah ALAH. TEL/FAX 03-51213881 GST  NO:  001006288896 TaX INVOICE 9557368063013 1 X 5.20 5.20 $ SS EZL 44 CYBER MIX COLOR PAPER 100'58 1 X 8.90 8.90 5 No. 2 No. Items: 2 RM 13.30 RM 0.80 TaX Aht (Z) 0 RH 0.00 RH 0.Oo RH 0.00 RH 0.00 TOTAL RM 14-10 CASH RA 20. Q0 CHANGE RM 5-90 ThANK YOU FOR SHOPPING Goods SOLD ARE NOT  RETURNABLE . Frid-v, 29-12-2017 Tine 20817 Cas, SAM SAM Wc5 Swh 01 Inv:RO00721136 Qtys:",
+    "corrected_text": "SAM SAM TRADING co (742016-W) 67,JLN MEWAH 25/63 TmN SRI MUDA, 40400 Shah ALAH. TEL/FAX 03-51213881 GST  NO:  001006288896 TaX INVOICE 9557368063013 1 X 5.20 5.20 $ SS EZL 44 CYBER MIX COLOR PAPER 100'58 1 X 8.90 8.90 5 No. 2 No. Items: 2 RM 13.30 RM 0.80 TaX Aht (Z) 0 RH 0.00 RH 0.Oo RH 0.00 RH 0.00 TOTAL RM 14-10 CASH RA 20. Q0 CHANGE RM 5-90 ThANK YOU FOR SHOPPING Goods SOLD ARE NOT  RETURNABLE . Frid-v, 29-12-2017 Tine 20817 Cas, SAM SAM Wc5 Swh 01 Inv:RO00721136 Qtys:",
+    "token_count": 93
+  },
+  {
+    "filename": "doc_receipt_011.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "AIK HuAT HARDWeke (SETIA ALAM} SDN BHD '822737-X (X) SETIA SEKSYEN Ui3 '40170 shah\" TEL: 012 33623608 GST ND; 0u0394528768 Cash SALESPERSOH` TIHE; 15:28;00 ITEM QTY WP Ahount (RK 2000160000024 15 . Ud S BIG SIRETCK FILM ?22 JIAL QUANTITY 15.00 WISC 0.00 TOTAL 1 CASH 1 CHANGE XGST @ GST SUHMARY CODE % Tax/AHT SR 14.15 0.85 0.85",
+    "corrected_text": "AIK HuAT HARDWeke (SETIA ALAM} SDN BHD '822737-X (X) SETIA SEKSYEN Ui3 '40170 shah\" TEL: 012 33623608 GST ND; 0u0394528768 Cash SALESPERSOH` TIHE; 15:28;00 ITEM QTY WP Ahount (RK 2000160000024 15 . Ud S BIG SIRETCK FILM ?22 JIAL QUANTITY 15.00 WISC 0.00 TOTAL 1 CASH 1 CHANGE XGST @ GST SUHMARY CODE % Tax/AHT SR 14.15 0.85 0.85",
+    "token_count": 59
+  },
+  {
+    "filename": "doc_receipt_012.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "ELECTRICAL Na.113G & T15G, JALAN SETIA GEMBILANG UtjeG DANDAR SETIA ALAM, 40170 BANDAR SETIA ALAM, SELANIGOR Compzny Reg Nj. ;540371t551-P GST Rey No. '001637911168 Involce Nlo:: CS67332 Date 22/12/2017 14.03 Czahler#; RM Code 1.00 15.90 15.90 Subtotzl 15.90 Total Excl, 0r GST t5.00 Totz' Ingi, 0f GST 15.90 Total Amt Rounded 15.90 Payment 50.00 Change Duz 34.10 Totzl Item (6} - Artturii (GM) SR 6% 15.00 0.90 7 DaYSWitr ORIGINAL RECEIPT TQ ummaiy",
+    "corrected_text": "ELECTRICAL Na.113G & T15G, JALAN SETIA GEMBILANG UtjeG DANDAR SETIA ALAM, 40170 BANDAR SETIA ALAM, SELANIGOR Compzny Reg Nj. ;540371t551-P GST Rey No. '001637911168 Involce Nlo:: CS67332 Date 22/12/2017 14.03 Czahler#; RM Code 1.00 15.90 15.90 Subtotzl 15.90 Total Excl, 0r GST t5.00 Totz' Ingi, 0f GST 15.90 Total Amt Rounded 15.90 Payment 50.00 Change Duz 34.10 Totzl Item (6} - Artturii (GM) SR 6% 15.00 0.90 7 DaYSWitr ORIGINAL RECEIPT TQ ummaiy",
+    "token_count": 73
+  },
+  {
+    "filename": "doc_receipt_013.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "RESTORAN  HASSANBISTRO NO,2-1-1 JALAN FTIA PRINA 0 SHAt | AM Tax INVOICE TERHINAL CI CASHIER HASSAN BILL NQ CI-0170778 DATE 12/28/2017 |:17:32 PM TOKEN TABLE CT1 Prc U.Piice GST Total MAKANAM 15. (6 15.00 ZR Total Items Total| aty Sub Tqtal Rr 0lscount 15.00  RM 0,00 Total Exc|,6* GST RH GST 6* RM Qu Total Inc| ,6* GST RM 0,00 Rounding RH 15,00  0.Q0 CASH RM CHANGE RH 0.00 Thank You_ Aqa In 2017-12-28 22; |7PM 15.6 15.Q0 Cqme",
+    "corrected_text": "RESTORAN  HASSANBISTRO NO,2-1-1 JALAN FTIA PRINA 0 SHAt | AM Tax INVOICE TERHINAL CI CASHIER HASSAN BILL NQ CI-0170778 DATE 12/28/2017 |:17:32 PM TOKEN TABLE CT1 Prc U.Piice GST Total MAKANAM 15. (6 15.00 ZR Total Items Total| aty Sub Tqtal Rr 0lscount 15.00  RM 0,00 Total Exc|,6* GST RH GST 6* RM Qu Total Inc| ,6* GST RM 0,00 Rounding RH 15,00  0.Q0 CASH RM CHANGE RH 0.00 Thank You_ Aqa In 2017-12-28 22; |7PM 15.6 15.Q0 Cqme",
+    "token_count": 79
+  },
+  {
+    "filename": "doc_receipt_014.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "ASIA MART (SA0264195-T) NO.23 BATU 10, TAMAN JALAN KAPAR, 42200 KLANG, GST ID 001609584640 TAX INVOICE Do: No CSO2070163 Date: Cashier EIRA Time: Salesperson EIRA Ref:: (GST) (GST) Qty _ SIPrice  SiPrice Amount Iax_ 955864132002; 17 0.85 0,90 715.25 SR DELICIA CHOCOLATE [S0G) 9556231/1004: 3.55 3.55 3.55 Zrl GARDENIA ORIGINAL CLASSIC JUMBO (6OOG] 9556127101331 1.41 1.50 1.50 SR HU 1S LIME 50G 885019932072: 1.42 1.51 1.51 SR DOREMON CATCAT JOy 15G 385019932072; 142 1.51 1.51 SR DOREMON CATCAT JOy 15G 888800218851 ; 2.30 2.44 2.44 SR \"INUTE MAID PULPY (ORENI [J50ML] 30 4 3 2 J0 2.44 2.44 SR IPRENI {350ML] 1.60 60 SR Fvo 2.74 2.90 2.90 SR Tolal 25 32,69 Total Sales ( GST) 31.03 Discount 0.00 Total GST 1.65 Rounding 0.02 Tutal Sale8 (Incluelve of 32.70 CASH 40.00 GST SUMMARY 4 Cede Amt (RM) SR '27.48 ZRL 1.65 3.55 1.85 GOODS SOLD ARE NOT SENTOSA, SELANGOR: 22/1202017 00.06.00 Item Excluding GST) Change 7,30 Tolal 0.00 31.03 RETURNABLE , YOU.",
+    "corrected_text": "ASIA MART (SA0264195-T) NO.23 BATU 10, TAMAN JALAN KAPAR, 42200 KLANG, GST ID 001609584640 TAX INVOICE Do: No CSO2070163 Date: Cashier EIRA Time: Salesperson EIRA Ref:: (GST) (GST) Qty _ SIPrice  SiPrice Amount Iax_ 955864132002; 17 0.85 0,90 715.25 SR DELICIA CHOCOLATE [S0G) 9556231/1004: 3.55 3.55 3.55 Zrl GARDENIA ORIGINAL CLASSIC JUMBO (6OOG] 9556127101331 1.41 1.50 1.50 SR HU 1S LIME 50G 885019932072: 1.42 1.51 1.51 SR DOREMON CATCAT JOy 15G 385019932072; 142 1.51 1.51 SR DOREMON CATCAT JOy 15G 888800218851 ; 2.30 2.44 2.44 SR \"INUTE MAID PULPY (ORENI [J50ML] 30 4 3 2 J0 2.44 2.44 SR IPRENI {350ML] 1.60 60 SR Fvo 2.74 2.90 2.90 SR Tolal 25 32,69 Total Sales ( GST) 31.03 Discount 0.00 Total GST 1.65 Rounding 0.02 Tutal Sale8 (Incluelve of 32.70 CASH 40.00 GST SUMMARY 4 Cede Amt (RM) SR '27.48 ZRL 1.65 3.55 1.85 GOODS SOLD ARE NOT SENTOSA, SELANGOR: 22/1202017 00.06.00 Item Excluding GST) Change 7,30 Tolal 0.00 31.03 RETURNABLE , YOU.",
+    "token_count": 162
+  },
+  {
+    "filename": "doc_receipt_015.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "ELECTRICAL Na.113G & T15G, JALAN SETIA GEMBILANG UtjeG DANDAR SETIA ALAM, 40170 BANDAR SETIA ALAM, SELANIGOR Compzny Reg Nj. ;540371t551-P GST Rey No. '001637911168 Involce Nlo:: CS67332 Date 22/12/2017 14.03 Czahler#; RM Code 1.00 15.90 15.90 Subtotzl 15.90 Total Excl, 0r GST t5.00 Totz' Ingi, 0f GST 15.90 Total Amt Rounded 15.90 Payment 50.00 Change Duz 34.10 Totzl Item (6} - Artturii (GM) SR 6% 15.00 0.90 7 DaYSWitr ORIGINAL RECEIPT TQ ummaiy",
+    "corrected_text": "ELECTRICAL Na.113G & T15G, JALAN SETIA GEMBILANG UtjeG DANDAR SETIA ALAM, 40170 BANDAR SETIA ALAM, SELANIGOR Compzny Reg Nj. ;540371t551-P GST Rey No. '001637911168 Involce Nlo:: CS67332 Date 22/12/2017 14.03 Czahler#; RM Code 1.00 15.90 15.90 Subtotzl 15.90 Total Excl, 0r GST t5.00 Totz' Ingi, 0f GST 15.90 Total Amt Rounded 15.90 Payment 50.00 Change Duz 34.10 Totzl Item (6} - Artturii (GM) SR 6% 15.00 0.90 7 DaYSWitr ORIGINAL RECEIPT TQ ummaiy",
+    "token_count": 73
+  },
+  {
+    "filename": "doc_receipt_016.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "LIGHTROOM  GALLERY SDN BHD No: 28, JALAN ASTANA 1C, 41050 KLANG  SELANGOR D.E, MALAYSTA ROC No. (1072825-A) GST No. 000584089600 Tel:03-3362 4395 Fax:03-3362 4395 TAX INVOICE CASHIER Bill No: LCS03908 Cas \": ANGELA Cover 1 Bill Date 20/12/2017 Bill Start: 20/12/2017 07:10:35 PM Code 300-Coo01 Name CASH Address GST No. CHI50514 SR 2PIN 2PCS 7 RM 2. 83 UNT 0. 17) =RM 2.83 YT51874 SR YE3O   BK 7w Ww LED) TRACK LIGH [ 2 * RH 33. 02 UN [ 3. 96) =RM 66 , 04 Suh Total RM 68 . 87 Service Charge RM 0.00 GST/TAX 6x RM 4.13 RM 73. 00 CA_ RM 73. 00 CHANGE = RM 0.00 Item Count: 2 Qty Count 3. 0 Closed Bi ll: 20/12/2017 07:10:51 PM Thank You; Please colle again; Goods Sold are not   refundable, returnable BANK ACC MBB 5128 4851 2118 BANK Ac  MBB   5626  4732 1744 BANK  ACC' AMBANK 888   100 123 3706 GST   Summary Amount (RM) Tax (RM) SR 68, 87 4.13 ZR/OS/EZ 0.00 0. 00 Stat ion:",
+    "corrected_text": "LIGHTROOM  GALLERY SDN BHD No: 28, JALAN ASTANA 1C, 41050 KLANG  SELANGOR D.E, MALAYSTA ROC No. (1072825-A) GST No. 000584089600 Tel:03-3362 4395 Fax:03-3362 4395 TAX INVOICE CASHIER Bill No: LCS03908 Cas \": ANGELA Cover 1 Bill Date 20/12/2017 Bill Start: 20/12/2017 07:10:35 PM Code 300-Coo01 Name CASH Address GST No. CHI50514 SR 2PIN 2PCS 7 RM 2. 83 UNT 0. 17) =RM 2.83 YT51874 SR YE3O   BK 7w Ww LED) TRACK LIGH [ 2 * RH 33. 02 UN [ 3. 96) =RM 66 , 04 Suh Total RM 68 . 87 Service Charge RM 0.00 GST/TAX 6x RM 4.13 RM 73. 00 CA_ RM 73. 00 CHANGE = RM 0.00 Item Count: 2 Qty Count 3. 0 Closed Bi ll: 20/12/2017 07:10:51 PM Thank You; Please colle again; Goods Sold are not   refundable, returnable BANK ACC MBB 5128 4851 2118 BANK Ac  MBB   5626  4732 1744 BANK  ACC' AMBANK 888   100 123 3706 GST   Summary Amount (RM) Tax (RM) SR 68, 87 4.13 ZR/OS/EZ 0.00 0. 00 Stat ion:",
+    "token_count": 170
+  },
+  {
+    "filename": "doc_receipt_017.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "LIGHTROOM GALLERY No: 28, JALAN ASTANA 1G BANDAR  BUKIT RAJA, KLANG SELANGOR D. E ROC No. (1072825-4)_ GST No. 000584089600  Tel:03-3362 4395 Fax:03-3362 CREDIT NOTE Station: CASHIER C/N No: LCN00211 Cashier ANGELA Cover 1 Bill Date 20/11/2017 Bill Start: 20/11/2017 03;55.07 PM Code Name ESWARAN 012-6369400 Address GST No. SR REFER LCS03158 0 X INNTT YT51775 SR 1059 181 SQ W BK SUR LED LIGHT 1059   SQUARE  BLACK   FRAME 2 * RM 18. 77   UNI 2.25) =RM 37 . 55 Sub 1 a] RM 37 . 55 Service Charge RM 0. 00 GST/TAX 6% RM 2. 25 TOTAL RM 39. 80 CASII RM 39. 80 CHANGE  RM 0.00 Item Count: 2 Qty 'mt 2, 0 Clos-u Bill: 20/11/2017 03:55: 56 PM Thank You, Please come again; Goods Sold are re fundable, BANK ACC MBB 5128 4851 2118 returnable BANK  ACC MBB 5626 4732 1744 BANK   ACC  AMBANK   888 100 123 3706 GST Summary Amount (RM) Tax (RM) SR @ 6% 37 , 55 ZR/OS/EZ 2. 25 0. 00 0. 00 BHD SDN 41050 MALAYSIA 4395",
+    "corrected_text": "LIGHTROOM GALLERY No: 28, JALAN ASTANA 1G BANDAR  BUKIT RAJA, KLANG SELANGOR D. E ROC No. (1072825-4)_ GST No. 000584089600  Tel:03-3362 4395 Fax:03-3362 CREDIT NOTE Station: CASHIER C/N No: LCN00211 Cashier ANGELA Cover 1 Bill Date 20/11/2017 Bill Start: 20/11/2017 03;55.07 PM Code Name ESWARAN 012-6369400 Address GST No. SR REFER LCS03158 0 X INNTT YT51775 SR 1059 181 SQ W BK SUR LED LIGHT 1059   SQUARE  BLACK   FRAME 2 * RM 18. 77   UNI 2.25) =RM 37 . 55 Sub 1 a] RM 37 . 55 Service Charge RM 0. 00 GST/TAX 6% RM 2. 25 TOTAL RM 39. 80 CASII RM 39. 80 CHANGE  RM 0.00 Item Count: 2 Qty 'mt 2, 0 Clos-u Bill: 20/11/2017 03:55: 56 PM Thank You, Please come again; Goods Sold are re fundable, BANK ACC MBB 5128 4851 2118 returnable BANK  ACC MBB 5626 4732 1744 BANK   ACC  AMBANK   888 100 123 3706 GST Summary Amount (RM) Tax (RM) SR @ 6% 37 , 55 ZR/OS/EZ 2. 25 0. 00 0. 00 BHD SDN 41050 MALAYSIA 4395",
+    "token_count": 175
+  },
+  {
+    "filename": "doc_receipt_018.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "LIGHTROOM  GALLERY SDN BHD No: 28, JALAN ASTANA 1C, 41050 KLANG  SELANGOR D.E, MALAYSTA ROC No. (1072825-A) GST No. 000584089600 Tel:03-3362 4395 Fax:03-3362 4395 TAX INVOICE CASHIER Bill No: LCS03908 Cas \": ANGELA Cover 1 Bill Date 20/12/2017 Bill Start: 20/12/2017 07:10:35 PM Code 300-Coo01 Name CASH Address GST No. CHI50514 SR 2PIN 2PCS 7 RM 2. 83 UNT 0. 17) =RM 2.83 YT51874 SR YE3O   BK 7w Ww LED) TRACK LIGH [ 2 * RH 33. 02 UN [ 3. 96) =RM 66 , 04 Suh Total RM 68 . 87 Service Charge RM 0.00 GST/TAX 6x RM 4.13 RM 73. 00 CA_ RM 73. 00 CHANGE = RM 0.00 Item Count: 2 Qty Count 3. 0 Closed Bi ll: 20/12/2017 07:10:51 PM Thank You; Please colle again; Goods Sold are not   refundable, returnable BANK ACC MBB 5128 4851 2118 BANK Ac  MBB   5626  4732 1744 BANK  ACC' AMBANK 888   100 123 3706 GST   Summary Amount (RM) Tax (RM) SR 68, 87 4.13 ZR/OS/EZ 0.00 0. 00 Stat ion:",
+    "corrected_text": "LIGHTROOM  GALLERY SDN BHD No: 28, JALAN ASTANA 1C, 41050 KLANG  SELANGOR D.E, MALAYSTA ROC No. (1072825-A) GST No. 000584089600 Tel:03-3362 4395 Fax:03-3362 4395 TAX INVOICE CASHIER Bill No: LCS03908 Cas \": ANGELA Cover 1 Bill Date 20/12/2017 Bill Start: 20/12/2017 07:10:35 PM Code 300-Coo01 Name CASH Address GST No. CHI50514 SR 2PIN 2PCS 7 RM 2. 83 UNT 0. 17) =RM 2.83 YT51874 SR YE3O   BK 7w Ww LED) TRACK LIGH [ 2 * RH 33. 02 UN [ 3. 96) =RM 66 , 04 Suh Total RM 68 . 87 Service Charge RM 0.00 GST/TAX 6x RM 4.13 RM 73. 00 CA_ RM 73. 00 CHANGE = RM 0.00 Item Count: 2 Qty Count 3. 0 Closed Bi ll: 20/12/2017 07:10:51 PM Thank You; Please colle again; Goods Sold are not   refundable, returnable BANK ACC MBB 5128 4851 2118 BANK Ac  MBB   5626  4732 1744 BANK  ACC' AMBANK 888   100 123 3706 GST   Summary Amount (RM) Tax (RM) SR 68, 87 4.13 ZR/OS/EZ 0.00 0. 00 Stat ion:",
+    "token_count": 170
+  },
+  {
+    "filename": "doc_receipt_019.jpg",
+    "is_identical": true,
+    "fixes": {},
+    "original_raw_text": "3 1 8 0 0 4 8 No ; 002643276-4 L01\" JLN GENTING KLanG 53300 KL Site 1066 Telephone 05 - 40212008 CST No ; 0010 9010 5344 Recei pi InvolCe nunbrr 60000053668 35 .10 Titrc Pump # 02 V-Power 97 RM 86 . 00 2 450 Titre Total 86 . 00 Vi sa RM 86 . 00 00 % GST Rn 4 , 8 7 Total Gross A RM 86  00 Card 60188401 Points Awarded 35 Tic Num OPT 18/03/1 8 15 1 ( 06051 02 6 Petrol Pon 95 ven Relief under Section b) CST Act 2014 Thank You Pleasae Coie Agair",
+    "corrected_text": "3 1 8 0 0 4 8 No ; 002643276-4 L01\" JLN GENTING KLanG 53300 KL Site 1066 Telephone 05 - 40212008 CST No ; 0010 9010 5344 Recei pi InvolCe nunbrr 60000053668 35 .10 Titrc Pump # 02 V-Power 97 RM 86 . 00 2 450 Titre Total 86 . 00 Vi sa RM 86 . 00 00 % GST Rn 4 , 8 7 Total Gross A RM 86  00 Card 60188401 Points Awarded 35 Tic Num OPT 18/03/1 8 15 1 ( 06051 02 6 Petrol Pon 95 ven Relief under Section b) CST Act 2014 Thank You Pleasae Coie Agair",
+    "token_count": 104
+  }
+]

@@ -47,8 +47,8 @@ ocr:
   # sudo here for tesseract-ocr) and it covers Devanagari alongside Latin.
   # On Android this becomes Google ML Kit Text Recognition v2 -- the OCREngine
   # protocol means no call site changes.
-  engine: tesseract       # tesseract | easyocr
-  languages: [eng, hin]   # Latin + Devanagari
+  engine: easyocr       # tesseract | easyocr
+  languages: [eng]        # Latin (easyocr english_g2)
   min_confidence: 30      # drop blocks below this (0-100)
 
 search:

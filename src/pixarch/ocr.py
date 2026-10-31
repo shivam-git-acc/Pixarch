@@ -38,13 +38,23 @@ class EasyOCREngine:
     name = "easyocr"
 
     def __init__(self, languages: Sequence[str] = ("en", "hi"), gpu: bool = True):
+        import ssl
+        import certifi
         import easyocr
+        import torch
+
+        # On Windows, urllib may lack root CA certs unless certifi is wired in.
+        try:
+            ssl._create_default_https_context = lambda: ssl.create_default_context(cafile=certifi.where())
+        except Exception:
+            pass
 
         # EasyOCR uses 2-letter codes; map from the config's ISO-639-2 names.
         lang_map = {"eng": "en", "hin": "hi", "en": "en", "hi": "hi"}
         langs = [lang_map.get(l, l) for l in languages]
         self.languages = langs
-        self.reader = easyocr.Reader(langs, gpu=gpu, verbose=False)
+        use_gpu = bool(gpu and torch.cuda.is_available())
+        self.reader = easyocr.Reader(langs, gpu=use_gpu, verbose=False)
 
     def extract(self, image_path: Path) -> list[TextBlock]:
         results = self.reader.readtext(str(image_path))
@@ -66,7 +76,22 @@ class TesseractEngine:
     name = "tesseract"
 
     def __init__(self, languages: Sequence[str] = ("eng", "hin")):
+        import os
+        import shutil
         import pytesseract  # noqa: F401
+
+        if not shutil.which("tesseract"):
+            for candidate in [
+                Path("C:/Program Files/Tesseract-OCR/tesseract.exe"),
+                Path("C:/Program Files (x86)/Tesseract-OCR/tesseract.exe"),
+            ]:
+                if candidate.exists():
+                    pytesseract.pytesseract.tesseract_cmd = str(candidate)
+                    break
+
+        local_tessdata = Path("data/tessdata").resolve()
+        if local_tessdata.exists() and "TESSDATA_PREFIX" not in os.environ:
+            os.environ["TESSDATA_PREFIX"] = str(local_tessdata)
 
         self.lang = "+".join(languages)
 

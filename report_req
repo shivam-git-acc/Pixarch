@@ -1,0 +1,14 @@
+Report content
+1) Labeled Dataset Creation
+2) Models used for PC simulation
+3) Finalized models to be used for edge device
+3) Baseline Architecture
+4) Results
+5) Github Repo
+
+Metrics
+1) Recall at various k's for each bucket and then taking average across all
+2) Individual module benchmarks, eg. OCR Model, Clip model (both ingestion (doc or scene image ground truth) and query (at routing stage doc or scene))
+3) Ranking metrics MRR, ndcg ... using ground truth
+4) Performance metrics, execution speed per query, latency, ingestion speed, etc.
+5) Memory usage of index.db, all models memory required for PC currently

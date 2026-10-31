@@ -63,7 +63,10 @@ def main() -> int:
     ap.add_argument("--config", default=str(ROOT / "configs/baseline.yaml"))
     ap.add_argument("--per-class", type=int, default=10, help="scene images per class")
     ap.add_argument("--receipts", type=int, default=20)
-    ap.add_argument("--skip", nargs="*", default=[], choices=["scenes", "receipts", "docs"])
+    ap.add_argument("--skip", nargs="*", default=[],
+                    choices=["scenes", "receipts", "docs", "synthetic", "xray"])
+    ap.add_argument("--per-doc", type=int, default=20,
+                    help="images per document subtype (real and synthetic)")
     args = ap.parse_args()
 
     cfg = yaml.safe_load(Path(args.config).read_text())
@@ -73,18 +76,46 @@ def main() -> int:
 
     records = []
 
+    gt_path = ROOT / "data/ocr_groundtruth.jsonl"
+
     if "docs" not in args.skip:
-        print("Wikimedia Commons (identity-document specimens)")
+        print("Wikimedia Commons (identity-document specimens -- held-out realism check)")
         try:
             records += fetchers.fetch_commons_docs(raw_dir)
         except Exception as e:  # noqa: BLE001
             print(f"  ! commons failed: {e}")
 
+        print("\nReal documents (HuggingFace: invoices, forms)")
+        try:
+            records += fetchers.fetch_docs_hf(raw_dir, n=args.per_doc, gt_path=gt_path)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ! hf docs failed: {e}")
+
+        print("\nHandwritten note pages (composed from real IAM lines)")
+        try:
+            records += fetchers.fetch_handwritten_pages(raw_dir, n=args.per_doc, gt_path=gt_path)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ! handwritten failed: {e}")
+
+        print("\nBook title pages (Wikimedia Commons)")
+        try:
+            records += fetchers.fetch_commons_books(raw_dir, n=args.per_doc)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ! commons books failed: {e}")
+
+    if "synthetic" not in args.skip:
+        print("\nSynthetic specimens (identity + financial -- no real PII)")
+        from pixarch import synthetic
+        try:
+            records += synthetic.generate(raw_dir, n=args.per_doc, gt_path=gt_path)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ! synthetic failed: {e}")
+
     if "receipts" not in args.skip:
         print("\nSROIE receipts (HuggingFace)")
         try:
             records += fetchers.fetch_receipts_hf(
-                raw_dir, n=args.receipts, gt_path=ROOT / "data/ocr_groundtruth.jsonl"
+                raw_dir, n=args.receipts, gt_path=gt_path
             )
         except Exception as e:  # noqa: BLE001
             print(f"  ! SROIE unavailable ({type(e).__name__}); falling back to Openverse")
@@ -112,6 +143,13 @@ def main() -> int:
             except Exception as e:  # noqa: BLE001
                 print(f"  ! Openverse fallback also failed: {e}")
         records += scene_records
+
+        if "xray" not in args.skip:
+            print("\nRadiographs (no SUN397 equivalent)")
+            try:
+                records += fetchers.fetch_xray_hf(raw_dir, n=args.per_class)
+            except Exception as e:  # noqa: BLE001
+                print(f"  ! xray failed: {e}")
 
     if not records:
         print("\nNo records fetched -- nothing written.", file=sys.stderr)

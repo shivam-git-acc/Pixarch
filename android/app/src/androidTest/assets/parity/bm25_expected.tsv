@@ -18,6 +18,84 @@ Z3ltIHdvcmtvdXQ=
 aW5zaWRlIGEgc2hvcHBpbmcgbWFsbA==	doc_handwritten_016,doc_receipt_010	5.270406,4.039262
 bXkgY2FyZA==	doc_credit_card_000,doc_credit_card_001,doc_credit_card_003,doc_credit_card_008,doc_credit_card_016,doc_debit_card_000,doc_debit_card_001,doc_debit_card_002,doc_debit_card_004,doc_debit_card_005	2.362518,2.362518,2.362518,2.362518,2.362518,2.362518,2.362518,2.362518,2.362518,2.362518
 dGhhdCB0aGluZyBmcm9tIGxhc3QgZGVjZW1iZXI=	doc_handwritten_016,doc_handwritten_008,doc_handwritten_007,doc_general_doc_017,doc_general_doc_005,doc_general_doc_014	9.477435,5.002828,4.404932,3.612968,3.107690,2.253814
+YWFkaGFhciBudW1iZXI=	doc_aadhaar_100,doc_aadhaar_101,doc_aadhaar_102,doc_aadhaar_103,doc_aadhaar_104,doc_aadhaar_105,doc_aadhaar_106,doc_aadhaar_107,doc_aadhaar_108,doc_aadhaar_109	4.817085,4.817085,4.817085,4.817085,4.817085,4.817085,4.817085,4.817085,4.817085,4.817085
+dW5pcXVlIGlkZW50aWZpY2F0aW9uIGF1dGhvcml0eSBjYXJk	doc_aadhaar_100,doc_aadhaar_101,doc_aadhaar_102,doc_aadhaar_103,doc_aadhaar_104,doc_aadhaar_105,doc_aadhaar_106,doc_aadhaar_107,doc_aadhaar_108,doc_aadhaar_109	9.742202,9.742202,9.742202,9.742202,9.742202,9.742202,9.742202,9.742202,9.742202,9.742202
+cGVybWFuZW50IGFjY291bnQgbnVtYmVy	doc_pan_100,doc_pan_101,doc_pan_102,doc_pan_103,doc_pan_104,doc_pan_105,doc_pan_106,doc_pan_107,doc_pan_108,doc_pan_109	5.871316,5.871316,5.871316,5.871316,5.871316,5.871316,5.871316,5.871316,5.871316,5.871316
+aW5jb21lIHRheCBkZXBhcnRtZW50IGNhcmQ=	doc_pan_100,doc_pan_101,doc_pan_102,doc_pan_103,doc_pan_104,doc_pan_105,doc_pan_106,doc_pan_107,doc_pan_108,doc_pan_109	8.241227,8.241227,8.241227,8.241227,8.241227,8.241227,8.241227,8.241227,8.241227,8.241227
+cGFzc3BvcnQgbnVtYmVyIGFuZCBkYXRlIG9mIGV4cGlyeQ==	doc_passport_100,doc_passport_101,doc_passport_102,doc_passport_103,doc_passport_104,doc_passport_105,doc_passport_106,doc_passport_107,doc_passport_108,doc_passport_109	4.962495,4.962495,4.962495,4.962495,4.962495,4.962495,4.962495,4.962495,4.962495,4.962495
+cmVwdWJsaWMgb2YgaW5kaWEgdHJhdmVsIGRvY3VtZW50	doc_general_doc_012,doc_passport_100,doc_passport_101,doc_passport_102,doc_passport_103,doc_passport_104,doc_passport_105,doc_passport_106,doc_passport_107,doc_passport_108	6.375764,4.906825,4.906825,4.906825,4.906825,4.906825,4.906825,4.906825,4.906825,4.906825
+bXkgZHJpdmluZyBsaWNlbnNlIHZhbGlkaXR5	doc_dl_100,doc_dl_101,doc_dl_102,doc_dl_103,doc_dl_104,doc_dl_105,doc_dl_106,doc_dl_107,doc_dl_108,doc_dl_109	3.582491,3.582491,3.582491,3.582491,3.582491,3.582491,3.582491,3.582491,3.582491,3.582491
+dHJhbnNwb3J0IGRlcGFydG1lbnQgbGljZW5jZQ==	doc_dl_100,doc_dl_101,doc_dl_102,doc_dl_103,doc_dl_104,doc_dl_105,doc_dl_106,doc_dl_107,doc_dl_108,doc_dl_109	9.588415,9.588415,9.588415,9.588415,9.588415,9.588415,9.588415,9.588415,9.588415,9.588415
+aW52b2ljZSBmcm9tIHRoZSBzZWxsZXI=	doc_receipt_007,doc_receipt_015,doc_receipt_019,doc_receipt_012,doc_receipt_013,doc_receipt_003,doc_receipt_010,doc_receipt_009,doc_receipt_011,doc_receipt_002	4.062982,3.794005,2.668503,2.605212,2.584778,2.554719,2.405527,2.353976,2.329020,2.304588
+bXkgYmlsbHM=	doc_receipt_016,doc_receipt_018,doc_receipt_017,doc_receipt_005,doc_receipt_000,doc_receipt_013,doc_receipt_011	5.142443,5.142443,4.658655,3.981006,3.605081,3.294027,2.968091
+aW52b2ljZSBudW1iZXIgYW5kIGFtb3VudCBkdWU=	doc_receipt_015,doc_receipt_012,doc_general_doc_014,doc_receipt_011,doc_general_doc_011,doc_receipt_003,doc_receipt_008,doc_receipt_005,doc_receipt_007,doc_receipt_016	10.213198,8.669162,5.719401,5.696538,5.169183,5.109439,5.095870,4.126581,4.062982,4.018936
+YSBwYWdlIGZyb20gYSBib29r	doc_handwritten_013,doc_receipt_000,doc_bill_012,doc_general_doc_006,doc_general_doc_012,doc_general_doc_017,doc_general_doc_009,doc_general_doc_007,doc_general_doc_016,doc_general_doc_001	4.598972,4.401572,4.273181,3.889501,3.298271,2.927648,2.752387,2.695437,2.177341,2.062435
+Ym9vayB0aXRsZSBwYWdl	doc_general_doc_017,doc_general_doc_009,doc_general_doc_007,doc_handwritten_013,doc_receipt_000,doc_bill_012,doc_general_doc_006,doc_general_doc_012,doc_general_doc_016,doc_general_doc_001	6.768674,6.363475,6.231807,4.598972,4.401572,4.273181,3.889501,3.298271,2.177341,2.062435
+c2Nhbm5lZCBib29rIHdpdGggYXV0aG9yIGFuZCBwdWJsaXNoZXI=	doc_handwritten_013,doc_receipt_000,doc_bill_012,doc_aadhaar_100,doc_aadhaar_101,doc_aadhaar_102,doc_aadhaar_103,doc_aadhaar_104,doc_aadhaar_105,doc_aadhaar_106	10.112799,4.401572,4.273181,3.136023,3.136023,3.136023,3.136023,3.136023,3.136023,3.136023
+YSBzY2FubmVkIGZvcm0=	doc_handwritten_004,doc_general_doc_012,doc_general_doc_017,doc_general_doc_002,doc_general_doc_000,doc_general_doc_016,doc_general_doc_018,doc_general_doc_014	5.097939,4.684699,4.310345,3.019279,2.869374,2.253899,2.180992,1.890518
+b2ZmaWNpYWwgZm9ybSB3aXRoIGZpbGxlZCBmaWVsZHM=	doc_handwritten_004,doc_general_doc_014,doc_general_doc_012,doc_general_doc_017,doc_general_doc_019,doc_general_doc_007,doc_general_doc_002,doc_general_doc_000,doc_general_doc_011,doc_general_doc_016	5.097939,4.763239,4.684699,4.310345,4.019465,3.326400,3.019279,2.869374,2.635630,2.253899
+YSBwcmludGVkIGRvY3VtZW50IHBhZ2U=	doc_general_doc_012,doc_general_doc_014,doc_general_doc_001,doc_receipt_000,doc_general_doc_010,doc_general_doc_006,doc_bill_003,doc_general_doc_008,doc_general_doc_017,doc_bill_006	9.674034,7.342411,6.467700,4.140233,4.094236,3.889501,3.889200,3.533556,2.927648,2.795674
+aGFuZHdyaXR0ZW4gbm90ZXM=	doc_general_doc_017,doc_general_doc_002,doc_general_doc_014,doc_general_doc_000,doc_receipt_017,doc_general_doc_003	3.277365,3.265135,3.262295,3.103024,2.700752,1.757074
+bXkgaGFuZHdyaXRpbmc=		
+bm90ZXMgd3JpdHRlbiBieSBoYW5k	doc_general_doc_018,doc_handwritten_014,doc_handwritten_012,doc_bill_003,doc_bill_002,doc_general_doc_017,doc_general_doc_002,doc_general_doc_014,doc_general_doc_000,doc_bill_010	5.128927,4.147279,4.127714,3.889200,3.739602,3.277365,3.265135,3.262295,3.103024,3.059621
+bXkgY3JlZGl0IGNhcmQ=	doc_credit_card_000,doc_credit_card_001,doc_credit_card_003,doc_credit_card_008,doc_credit_card_016,doc_credit_card_002,doc_credit_card_004,doc_credit_card_005,doc_credit_card_006,doc_credit_card_007	5.767738,5.767738,5.767738,5.767738,5.767738,5.759513,5.759513,5.759513,5.759513,5.759513
+Y3JlZGl0IGNhcmQgbnVtYmVy	doc_credit_card_000,doc_credit_card_001,doc_credit_card_003,doc_credit_card_008,doc_credit_card_016,doc_credit_card_002,doc_credit_card_004,doc_credit_card_005,doc_credit_card_006,doc_credit_card_007	5.767738,5.767738,5.767738,5.767738,5.767738,5.759513,5.759513,5.759513,5.759513,5.759513
+Y2FyZCB2YWxpZCB0aHJ1IGRhdGU=	doc_credit_card_000,doc_credit_card_001,doc_credit_card_003,doc_credit_card_008,doc_credit_card_016,doc_debit_card_000,doc_debit_card_001,doc_debit_card_002,doc_debit_card_004,doc_debit_card_005	7.480869,7.480869,7.480869,7.480869,7.480869,7.480869,7.480869,7.480869,7.480869,7.480869
+bXkgZGViaXQgY2FyZA==	doc_debit_card_000,doc_debit_card_001,doc_debit_card_002,doc_debit_card_004,doc_debit_card_005,doc_debit_card_018,doc_debit_card_003,doc_debit_card_006,doc_debit_card_007,doc_debit_card_008	5.826896,5.826896,5.826896,5.826896,5.826896,5.826896,5.818586,5.818586,5.818586,5.818586
+ZGViaXQgY2FyZCBkZXRhaWxz	doc_debit_card_000,doc_debit_card_001,doc_debit_card_002,doc_debit_card_004,doc_debit_card_005,doc_debit_card_018,doc_debit_card_003,doc_debit_card_006,doc_debit_card_007,doc_debit_card_008	5.826896,5.826896,5.826896,5.826896,5.826896,5.826896,5.818586,5.818586,5.818586,5.818586
+YXRtIGNhcmQ=	doc_bank_statement_015,doc_bank_statement_005,doc_bank_statement_002,doc_bank_statement_007,doc_passbook_002,doc_credit_card_000,doc_credit_card_001,doc_credit_card_003,doc_credit_card_008,doc_credit_card_016	2.683904,2.583001,2.459701,2.452241,2.448018,2.362518,2.362518,2.362518,2.362518,2.362518
+YmFuayBwYXNzYm9vaw==	doc_passbook_007,doc_passbook_014,doc_passbook_017,doc_passbook_003,doc_passbook_010,doc_passbook_012,doc_passbook_004,doc_passbook_009,doc_passbook_011,doc_passbook_015	4.502667,4.502667,4.502667,4.497160,4.497160,4.497160,4.486190,4.486190,4.486190,4.486190
+c2F2aW5ncyBhY2NvdW50IHBhc3Nib29r	doc_passbook_007,doc_passbook_014,doc_passbook_017,doc_passbook_003,doc_passbook_010,doc_passbook_012,doc_passbook_004,doc_passbook_009,doc_passbook_011,doc_passbook_015	6.593661,6.593661,6.593661,6.583608,6.583608,6.583608,6.563609,6.563609,6.563609,6.563609
+cGFzc2Jvb2sgd2l0aCB0cmFuc2FjdGlvbnM=	doc_handwritten_014,doc_receipt_011,doc_passbook_007,doc_passbook_014,doc_passbook_017,doc_passbook_003,doc_passbook_010,doc_passbook_012,doc_passbook_004,doc_passbook_009	5.245425,3.910795,3.793256,3.793256,3.793256,3.789178,3.789178,3.789178,3.781049,3.781049
+YmFuayBzdGF0ZW1lbnQ=	doc_bank_statement_019,doc_bank_statement_001,doc_bank_statement_000,doc_bank_statement_010,doc_bank_statement_017,doc_bank_statement_002,doc_bank_statement_003,doc_bank_statement_008,doc_bank_statement_012,doc_bank_statement_016	4.852978,4.839315,4.834778,4.834778,4.830250,4.825729,4.825729,4.825729,4.825729,4.825729
+c3RhdGVtZW50IG9mIGFjY291bnQ=	doc_bank_statement_019,doc_bank_statement_001,doc_bank_statement_000,doc_bank_statement_010,doc_bank_statement_017,doc_bank_statement_002,doc_bank_statement_003,doc_bank_statement_008,doc_bank_statement_012,doc_bank_statement_016	5.017469,5.001433,4.996111,4.996111,4.990802,4.985505,4.985505,4.985505,4.985505,4.985505
+bXkgYWNjb3VudCB0cmFuc2FjdGlvbnM=	doc_handwritten_014,doc_receipt_011,doc_pan_100,doc_pan_101,doc_pan_102,doc_pan_103,doc_pan_104,doc_pan_105,doc_pan_106,doc_pan_107	5.245425,3.910795,1.556026,1.556026,1.556026,1.556026,1.556026,1.556026,1.556026,1.556026
+c2Nob29sIHJlcG9ydCBjYXJk	doc_report_card_008,doc_report_card_003,doc_report_card_004,doc_report_card_006,doc_report_card_009,doc_report_card_011,doc_report_card_013,doc_report_card_017,doc_report_card_000,doc_report_card_001	10.338151,10.310446,10.310446,10.310446,10.310446,10.310446,10.310446,10.310446,6.399461,6.399461
+bXkgbWFya3MgYW5kIGdyYWRlcw==	doc_report_card_000,doc_report_card_001,doc_report_card_002,doc_report_card_005,doc_report_card_012,doc_report_card_014,doc_report_card_015,doc_report_card_007,doc_report_card_008,doc_report_card_010	6.425065,6.425065,6.425065,6.425065,6.425065,6.425065,6.425065,6.399806,6.399806,6.399806
+cHJvZ3Jlc3MgcmVwb3J0IGZyb20gc2Nob29s	doc_report_card_008,doc_report_card_003,doc_report_card_004,doc_report_card_006,doc_report_card_009,doc_report_card_011,doc_report_card_013,doc_report_card_017,doc_report_card_000,doc_report_card_001	10.990154,10.951494,10.951494,10.951494,10.951494,10.951494,10.951494,10.951494,7.062547,7.062547
+c2VhIGFuZCBzYW5k	doc_handwritten_000,doc_handwritten_003	7.907282,7.017058
+c2Vhc2lkZSBob2xpZGF5IHBob3Rv	doc_handwritten_014	5.827442
+c25vd3kgcGVha3M=		
+aGlsbHMgbGFuZHNjYXBl	doc_bill_012	5.123228
+d29vZHM=		
+Z3JlZW4gZm9yZXN0IHBob3Rv	doc_handwritten_000,doc_handwritten_010,doc_bill_001,doc_bill_013	5.052122,4.814909,4.053591,3.966287
+Y2FycyBpbiBhIHBhcmtpbmcgbG90	doc_bill_004,doc_handwritten_019,doc_receipt_019,doc_receipt_002,doc_general_doc_006,doc_receipt_004	7.945971,4.340621,3.707923,3.202258,3.185315,3.042665
+cGhvdG8gb2YgdmVoaWNsZXM=	doc_handwritten_001	6.057120
+Y2VsZWJyYXRpb24gd2l0aCBmcmllbmRz	doc_handwritten_009	5.772719
+bmlnaHRjbHViIHBob3Rv		
+dW5pdmVyc2l0eSBidWlsZGluZ3M=	doc_handwritten_012	5.799952
+c3R1ZGVudHMgb24gY2FtcHVz	doc_report_card_000,doc_report_card_001,doc_report_card_002,doc_report_card_005,doc_report_card_012,doc_report_card_014,doc_report_card_015,doc_report_card_007,doc_report_card_008,doc_report_card_010	2.879965,2.879965,2.879965,2.879965,2.879965,2.879965,2.879965,2.865915,2.865915,2.865915
+YSBtZWFsIG9uIGEgcGxhdGU=	doc_general_doc_004,doc_general_doc_014	4.729800,2.585807
+cmVzdGF1cmFudCBmb29k	doc_receipt_009	6.330538
+b3V0ZG9vciBwYXJrIHBob3Rv	doc_general_doc_006	3.185315
+Z2FyZGVuIHBhdGh3YXk=	doc_bill_012,doc_bill_010,doc_bill_006	5.123228,3.869769,3.535932
+ZXhlcmNpc2UgZXF1aXBtZW50	doc_handwritten_004,doc_handwritten_005,doc_bill_005	4.907070,4.883700,4.814909
+cGVvcGxlIHRyYWluaW5nIGluZG9vcnM=	doc_general_doc_005	3.725890
+c2hvcHBpbmcgY2VudHJlIGludGVyaW9y	doc_handwritten_016,doc_receipt_010	5.270406,4.039262
+c2hvcHMgaW5zaWRlIGEgYnVpbGRpbmc=	doc_handwritten_012,doc_handwritten_016,doc_receipt_010	5.799952,5.270406,4.039262
+d2VkZGluZyBwaG90b3M=		
+bWFycmlhZ2UgY2VyZW1vbnk=		
+cmVjZXB0aW9uIGhhbGwgY2VsZWJyYXRpb24=	doc_handwritten_010,doc_handwritten_013,doc_bill_013	5.196167,4.963132,3.966287
+cGhvdG8gb2YgYW4gYWVyb3BsYW5l		
+YWlyY3JhZnQgb24gdGhlIHJ1bndheQ==		
+YWlycG9ydCB3aXRoIHBsYW5lcw==		
+cGxheWluZyBzcG9ydHMgb3V0c2lkZQ==	doc_handwritten_002,doc_bill_003,doc_receipt_009,doc_bill_010,doc_bill_018	6.087110,4.287455,3.445210,3.372927,3.014529
+YSBzcG9ydHMgZ3JvdW5k		
+YXRobGV0aWMgZmllbGQgcGhvdG8=	doc_general_doc_019,doc_general_doc_007,doc_general_doc_011,doc_general_doc_003	4.019465,3.326400,2.635630,1.936998
+Y2xvdGhpbmcgc3RvcmU=	doc_handwritten_014,doc_receipt_009	5.827442,4.391280
+Y2xvdGhlcyBvbiByYWNrcw==	doc_handwritten_014,doc_bill_001	5.827442,4.859956
+c2hvcHBpbmcgZm9yIGdhcm1lbnRz	doc_handwritten_016,doc_receipt_010	5.270406,4.039262
+cGFpbnRpbmdzIGluIGEgZ2FsbGVyeQ==	doc_bill_002,doc_receipt_017,doc_receipt_016,doc_receipt_018	5.254605,3.165243,3.126640,3.126640
+YXJ0IGV4aGliaXRpb24=	doc_bill_013,doc_bill_019	5.289719,5.227255
+YXJ0d29yayBvbiBkaXNwbGF5		
+cmFpbHdheSBzdGF0aW9uIHBsYXRmb3Jt	doc_bill_016,doc_receipt_017,doc_receipt_016,doc_receipt_018	4.823447,2.977310,2.940999,2.940999
+d2FpdGluZyBhdCB0aGUgdHJhaW4gc3RhdGlvbg==	doc_bill_016,doc_receipt_017,doc_receipt_016,doc_receipt_018	4.823447,2.977310,2.940999,2.940999
+YWlycG9ydCB0ZXJtaW5hbA==	doc_receipt_013	4.821835
+Y2hlc3QgeC1yYXk=	doc_receipt_002,doc_receipt_004,doc_receipt_011,doc_receipt_010,doc_general_doc_011,doc_receipt_015,doc_general_doc_001,doc_receipt_012,doc_general_doc_017,doc_receipt_008	5.099860,4.995747,4.827336,3.839372,3.094840,3.071961,3.012298,2.901957,2.749781,2.273006
+bXkgcmFkaW9ncmFwaA==		
+bWVkaWNhbCB4LXJheSBpbWFnZQ==	doc_handwritten_019,doc_receipt_002,doc_receipt_004,doc_receipt_011,doc_general_doc_008,doc_receipt_010,doc_general_doc_011,doc_receipt_015,doc_general_doc_001,doc_receipt_012	5.827442,5.099860,4.995747,4.827336,4.503886,3.839372,3.094840,3.071961,3.012298,2.901957
+bXkgYmFuayBkb2N1bWVudHM=	doc_general_doc_012,doc_receipt_000,doc_general_doc_008,doc_general_doc_014,doc_credit_card_000,doc_credit_card_001,doc_credit_card_003,doc_credit_card_008,doc_credit_card_016,doc_debit_card_000	6.375764,4.140233,3.533556,2.253814,1.112366,1.112366,1.112366,1.112366,1.112366,1.112366
+cGF5bWVudCBjYXJk	doc_receipt_015,doc_receipt_012,doc_general_doc_014,doc_credit_card_000,doc_credit_card_001,doc_credit_card_003,doc_credit_card_008,doc_credit_card_016,doc_debit_card_000,doc_debit_card_001	4.291062,4.053591,2.396079,2.362518,2.362518,2.362518,2.362518,2.362518,2.362518,2.362518
 cGhvdG9zIG9mIG15IHBhc3Nwb3J0	doc_passport_100,doc_passport_101,doc_passport_102,doc_passport_103,doc_passport_104,doc_passport_105,doc_passport_106,doc_passport_107,doc_passport_108,doc_passport_109	4.962493,4.962493,4.962493,4.962493,4.962493,4.962493,4.962493,4.962493,4.962493,4.962493
 YmVhY2ggcGFydHkgcGhvdG9z		
 d2hlcmUgaXMgbXk=	doc_handwritten_010,doc_handwritten_007	5.196167,5.053792

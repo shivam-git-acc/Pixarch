@@ -91,20 +91,10 @@ def run_eval(engine: SearchEngine, conn: sqlite3.Connection, queries, qrels, k_v
     avoid. Prefix metrics (p@1, recall@10, ...) are unaffected by the extra
     depth, so one deeper pass serves every metric.
     """
-    max_r = max((len(v) for v in qrels.values()), default=0)
-    depth = depth or max(top_k, max_r, max(k_values))
+    depth = depth or retrieval_depth(qrels, top_k, k_values)
     systems = build_systems(engine, conn, depth)
-    results: dict[str, dict] = {}
     runs: dict[str, dict[str, list[str]]] = {}
     latencies: dict[str, list[tuple[str, float]]] = {}
-
-    # Bucket comes from each query's gold_route: the document/scene split the
-    # report asks for. Kind (doc_lookup/scene_search/ambiguous) is kept too.
-    groups: dict[str, dict[str, list[str]]] = {"kind": defaultdict(list),
-                                               "bucket": defaultdict(list)}
-    for q in queries:
-        groups["kind"][q["kind"]].append(q["query_id"])
-        groups["bucket"][q["gold_route"]].append(q["query_id"])
 
     for name, fn in systems.items():
         run: dict[str, list[str]] = {}
@@ -115,6 +105,32 @@ def run_eval(engine: SearchEngine, conn: sqlite3.Connection, queries, qrels, k_v
             lat.append((branch, ms))
         runs[name] = run
         latencies[name] = lat
+
+    return score_runs(runs, queries, qrels, k_values), runs, latencies, depth
+
+
+def retrieval_depth(qrels, top_k: int, k_values) -> int:
+    """Depth every system is scored at: deep enough for R-precision (see run_eval)."""
+    max_r = max((len(v) for v in qrels.values()), default=0)
+    return max(top_k, max_r, max(k_values))
+
+
+def score_runs(runs: dict[str, dict[str, list[str]]], queries, qrels, k_values) -> dict[str, dict]:
+    """Metrics per system: overall, by query kind, by bucket, and bucket macro-average.
+
+    Split out of run_eval so rankings produced elsewhere (the on-device harness,
+    scripts/evaluate_device.py) are scored by exactly the same code.
+    """
+    # Bucket comes from each query's gold_route: the document/scene split the
+    # report asks for. Kind (doc_lookup/scene_search/ambiguous) is kept too.
+    groups: dict[str, dict[str, list[str]]] = {"kind": defaultdict(list),
+                                               "bucket": defaultdict(list)}
+    for q in queries:
+        groups["kind"][q["kind"]].append(q["query_id"])
+        groups["bucket"][q["gold_route"]].append(q["query_id"])
+
+    results: dict[str, dict] = {}
+    for name, run in runs.items():
         results[name] = {"overall": evaluate_run(run, qrels, k_values)}
 
         for grouping in groups.values():
@@ -136,7 +152,7 @@ def run_eval(engine: SearchEngine, conn: sqlite3.Connection, queries, qrels, k_v
             results[name]["bucket_macro"]["n_queries"] = sum(
                 b.get("n_queries", 0) for b in bucket_blocks)
 
-    return results, runs, latencies, depth
+    return results
 
 
 def latency_report(latencies: dict[str, list[tuple[str, float]]]) -> dict[str, dict]:

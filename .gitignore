@@ -16,3 +16,6 @@ venv/
 
 .cache/
 models/
+
+# On-device evaluation runs pulled from phones (scripts/run_device_eval.py)
+data/device_runs/

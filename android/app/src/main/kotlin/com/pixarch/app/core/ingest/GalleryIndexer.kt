@@ -30,6 +30,15 @@ data class IndexProgress(
     val error: String? = null
 )
 
+/**
+ * Receives per-stage wall time for one image, using the desktop stage names
+ * (`ingest`, `clip_encode`, `classify`, `embed_store`, `ocr`) so device and PC
+ * ingestion reports line up. Used by the on-device evaluation harness.
+ */
+fun interface StageTimer {
+    fun record(stage: String, ms: Double)
+}
+
 /** One gallery image as MediaStore describes it. */
 data class MediaItem(
     val uri: Uri,
@@ -108,9 +117,24 @@ class GalleryIndexer(
         return out
     }
 
-    /** @return true if a new item was indexed (false for duplicates / unreadable files). */
-    suspend fun indexSingleImage(item: MediaItem): Boolean = withContext(Dispatchers.IO) {
+    /**
+     * @param itemId id stored in the index; the evaluation harness passes the corpus
+     *   manifest id so results can be scored against the qrels.
+     * @param timer optional per-stage timing sink.
+     * @return true if a new item was indexed (false for duplicates / unreadable files).
+     */
+    suspend fun indexSingleImage(
+        item: MediaItem,
+        itemId: String = UUID.randomUUID().toString(),
+        timer: StageTimer? = null
+    ): Boolean = withContext(Dispatchers.IO) {
         val resolver = context.contentResolver
+        var t = System.nanoTime()
+        fun lap(stage: String) {
+            val now = System.nanoTime()
+            timer?.record(stage, (now - t) / 1e6)
+            t = now
+        }
 
         // Stage 0: hash + dedupe, original dimensions, EXIF.
         val sha256 = calculateSha256(resolver, item.uri) ?: return@withContext false
@@ -120,11 +144,13 @@ class GalleryIndexer(
 
         val bitmap = decodeSampledBitmap(resolver, item.uri, origW, origH, maxDimension = 1280)
             ?: return@withContext false
-        val itemId = UUID.randomUUID().toString()
+        lap("ingest")
         try {
             // Stage 1: CLIP encode once; the same embedding classifies and indexes.
             val embedding = clipRunner.encodeImage(bitmap)
+            lap("clip_encode")
             val verdict = bucketClassifier.classify(embedding)
+            lap("classify")
 
             database.insertItem(
                 ItemRecord(
@@ -143,6 +169,7 @@ class GalleryIndexer(
             )
             // Stage 2b: every embedding is stored; searchVector restricts to scene/hedged.
             database.insertEmbedding(itemId, "mobileclip2_s0_int8", embedding.size, embedding)
+            lap("embed_store")
 
             // Stage 2a: document branch only for document or hedged items.
             if (verdict.bucket == DOCUMENT || verdict.routedBoth) {
@@ -164,6 +191,7 @@ class GalleryIndexer(
                     // One bad scan must not lose the item: the scene branch still has it.
                     Log.w(TAG, "OCR failed for ${item.name}", e)
                 }
+                lap("ocr")
             }
             true
         } finally {

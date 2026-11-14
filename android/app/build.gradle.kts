@@ -43,6 +43,27 @@ android {
   }
 }
 
+// The ONNX models are generated (and gitignored), so a fresh clone has none and the
+// app would crash at start-up. Fail the build early with the fix instead.
+val checkEdgeModels by tasks.registering {
+  val assets = layout.projectDirectory.dir("src/main/assets")
+  val required = listOf(
+    "models/mobileclip_visual_int8.onnx",
+    "models/mobileclip_text_int8.onnx",
+    "tokenizer/bpe_simple_vocab_16e6.txt.gz",
+  ).map { assets.file(it).asFile }
+  doLast {
+    val missing = required.filterNot { it.isFile }
+    if (missing.isNotEmpty()) {
+      throw GradleException(
+        "Missing edge model assets:\n" + missing.joinToString("\n") { "  $it" } +
+          "\nGenerate them from the repo root with:\n  python scripts/export_edge_models.py"
+      )
+    }
+  }
+}
+tasks.named("preBuild") { dependsOn(checkEdgeModels) }
+
 dependencies {
   val composeBom = platform(libs.androidx.compose.bom)
   implementation(composeBom)

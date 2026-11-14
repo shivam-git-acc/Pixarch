@@ -43,7 +43,9 @@ class PixarchDatabase(context: Context, dbName: String = "pixarch.db") :
     SQLiteOpenHelper(context, dbName, null, DATABASE_VERSION) {
 
     companion object {
-        const val DATABASE_VERSION = 2
+        // v3: embeddings from app v1 came from a broken INT8 visual encoder and wrong
+        // preprocessing; bumping forces onUpgrade to drop them so the gallery re-indexes.
+        const val DATABASE_VERSION = 3
 
         private fun floatArrayToBlob(floats: FloatArray): ByteArray {
             val buffer = ByteBuffer.allocate(floats.size * 4).order(ByteOrder.LITTLE_ENDIAN)

@@ -11,16 +11,19 @@ data class SearchResult(
     val elapsedMs: Float
 )
 
+/**
+ * Routes to exactly one branch -- no fusion, no retry (`src/pixarch/query/engine.py`).
+ * The router's CLIP fallback uses the same document/scene prototypes as ingestion.
+ */
 class SearchEngine(
     private val database: PixarchDatabase,
     private val tokenizer: ClipTokenizer,
-    private val clipRunner: OnnxClipRunner
+    private val clipRunner: OnnxClipRunner,
+    bucketPrototypes: Map<String, FloatArray>
 ) {
     private val router = QueryRouter(
-        encodeTextFn = { text ->
-            val tokens = tokenizer.encode(text)
-            clipRunner.encodeText(tokens)
-        }
+        encodeTextFn = { text -> clipRunner.encodeText(tokenizer.encode(text)) },
+        prototypes = bucketPrototypes
     )
 
     fun search(query: String, topK: Int = 10, forceBranch: String? = null): SearchResult {
@@ -35,13 +38,9 @@ class SearchEngine(
             QueryRouter.DOCUMENT -> {
                 database.searchBm25(query, topK)
             }
-            QueryRouter.SCENE -> {
-                val tokens = tokenizer.encode(query)
-                val queryEmb = clipRunner.encodeText(tokens)
-                database.searchVector(queryEmb, topK)
-            }
             else -> {
-                database.searchBm25(query, topK)
+                val queryEmb = clipRunner.encodeText(tokenizer.encode(query))
+                database.searchVector(queryEmb, topK)
             }
         }
 

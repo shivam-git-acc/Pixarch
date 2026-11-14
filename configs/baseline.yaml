@@ -42,6 +42,34 @@ classify:
       - "a photograph of food"
       - "a casual photograph"
 
+edge:
+  # Android app (MobileCLIP2-S0 INT8). Used by scripts/calibrate_edge_buckets.py to
+  # build the bucket prototypes + threshold the app ships; the PC baseline above is
+  # untouched. With the baseline prompts MobileCLIP2 sent planes / transit hubs to
+  # `document` (signage reads as text). The three generic scene prompts below were
+  # chosen on one half of the corpus (alternate items per subtype) and raise
+  # held-out argmax accuracy 0.927 -> 0.959. All 20 x-rays still land in
+  # `document`, even with an explicit x-ray prompt -- left as a known difference.
+  classify:
+    prompts:
+      document:
+        - "a scanned identity document"
+        - "a photograph of a printed document"
+        - "a screenshot of a receipt or bill"
+        - "a page of text"
+        - "an identity card"
+      scene:
+        - "a photo of a landscape"
+        - "a photo of people at an event"
+        - "a snapshot of a place"
+        - "a photograph of food"
+        - "a casual photograph"
+        - "a photo of a vehicle, an airplane or a train"
+        - "a photo of a building, a street or a station"
+        - "a photo of people at a ceremony"
+    # Fraction of items routed to both branches; the threshold is derived from it.
+    hedge_fraction: 0.10
+
 ocr:
   # easyocr is the default: pip-installable with no system package (there is no
   # sudo here for tesseract-ocr) and it covers Devanagari alongside Latin.

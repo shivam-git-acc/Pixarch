@@ -51,6 +51,7 @@ val checkEdgeModels by tasks.registering {
     "models/mobileclip_visual_int8.onnx",
     "models/mobileclip_text_int8.onnx",
     "tokenizer/bpe_simple_vocab_16e6.txt.gz",
+    "classify/bucket_prototypes.tsv", // committed; regenerate: scripts/calibrate_edge_buckets.py
   ).map { assets.file(it).asFile }
   doLast {
     val missing = required.filterNot { it.isFile }
@@ -116,6 +117,9 @@ dependencies {
 
   // Coil for async image rendering
   implementation(libs.coil.compose)
+
+  // EXIF capture date + camera tags (screenshot heuristic)
+  implementation(libs.androidx.exifinterface)
 
   // Bundled SQLite with FTS5 support
   implementation(libs.requery.sqlite.android)

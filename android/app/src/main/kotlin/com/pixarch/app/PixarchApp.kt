@@ -2,6 +2,7 @@ package com.pixarch.app
 
 import android.app.Application
 import android.content.Context
+import com.pixarch.app.core.classify.BucketClassifier
 import com.pixarch.app.core.clip.ClipTokenizer
 import com.pixarch.app.core.clip.OnnxClipRunner
 import com.pixarch.app.core.ocr.MlKitOcrEngine
@@ -32,8 +33,13 @@ class PixarchApp : Application() {
         MlKitOcrEngine()
     }
 
+    /** Document/scene prototypes + hedge threshold (scripts/calibrate_edge_buckets.py). */
+    val bucketClassifier: BucketClassifier by lazy {
+        BucketClassifier.fromAssets(this)
+    }
+
     val searchEngine: SearchEngine by lazy {
-        SearchEngine(database, tokenizer, clipRunner)
+        SearchEngine(database, tokenizer, clipRunner, bucketClassifier.prototypes)
     }
 
     override fun onCreate() {

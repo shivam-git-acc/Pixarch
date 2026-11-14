@@ -3,6 +3,7 @@ package com.pixarch.app.core.storage
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+import com.pixarch.app.core.query.FtsQuery
 import io.requery.android.database.sqlite.SQLiteDatabase
 import io.requery.android.database.sqlite.SQLiteOpenHelper
 import java.nio.ByteBuffer
@@ -45,7 +46,9 @@ class PixarchDatabase(context: Context, dbName: String = "pixarch.db") :
     companion object {
         // v3: embeddings from app v1 came from a broken INT8 visual encoder and wrong
         // preprocessing; bumping forces onUpgrade to drop them so the gallery re-indexes.
-        const val DATABASE_VERSION = 3
+        // v4: CLIP zero-shot buckets + routed_both, normalised OCR text, OCR only on
+        // document/hedged items (Stage 1.5) -- old rows have different semantics.
+        const val DATABASE_VERSION = 4
 
         private fun floatArrayToBlob(floats: FloatArray): ByteArray {
             val buffer = ByteBuffer.allocate(floats.size * 4).order(ByteOrder.LITTLE_ENDIAN)
@@ -211,6 +214,11 @@ class PixarchDatabase(context: Context, dbName: String = "pixarch.db") :
             }
             db.insertWithOnConflict("doc_fields", null, fieldValues, SQLiteDatabase.CONFLICT_REPLACE)
 
+            // Re-indexing an item replaces its OCR rows instead of accumulating them
+            // (FTS5 has no primary key, so CONFLICT_REPLACE would not dedupe there).
+            db.delete("ocr_blocks", "item_id = ?", arrayOf(itemId))
+            db.delete("doc_fts", "item_id = ?", arrayOf(itemId))
+
             for (b in blocks) {
                 val blockValues = ContentValues().apply {
                     put("item_id", itemId)
@@ -251,21 +259,15 @@ class PixarchDatabase(context: Context, dbName: String = "pixarch.db") :
     }
 
     /**
-     * BM25 search over OCR text and document subtype.
-     * Weights: 1.0x for OCR body text, 5.0x for doc_type tag (matching desktop config).
+     * BM25 search over OCR text and document subtype, as `bm25_search.search` does.
+     * Weights: 1.0x for OCR body text, 5.0x for doc_type tag (configs/baseline.yaml).
      */
     fun searchBm25(queryText: String, topK: Int = 10): List<SearchHit> {
         val db = readableDatabase
         val hits = mutableListOf<SearchHit>()
 
-        // Escape FTS5 query terms: tokenize words into a prefix/match expression
-        val cleanTerms = queryText.split(Regex("[^a-zA-Z0-9]+"))
-            .filter { it.isNotBlank() }
-            .map { "\"$it\"*" }
-
-        if (cleanTerms.isEmpty()) return emptyList()
-
-        val ftsQuery = cleanTerms.joinToString(" OR ")
+        val ftsQuery = FtsQuery.toMatchQuery(queryText)
+        if (ftsQuery.isEmpty()) return emptyList()
 
         val sql = """
             SELECT item_id,
@@ -288,7 +290,9 @@ class PixarchDatabase(context: Context, dbName: String = "pixarch.db") :
                 hits.add(SearchHit(itemId, score, snippet, branch = "document"))
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            // A malformed MATCH expression yields no hits, not a crash (as in Python).
+            android.util.Log.w("PixarchDatabase", "FTS query failed for [$ftsQuery]", e)
+            hits.clear()
         } finally {
             cursor?.close()
         }
@@ -296,13 +300,22 @@ class PixarchDatabase(context: Context, dbName: String = "pixarch.db") :
     }
 
     /**
-     * Exact cosine similarity vector search over L2-normalized embeddings.
+     * Exact cosine similarity over L2-normalised embeddings. Like the desktop engine,
+     * the scene index covers only scene-bucket items plus low-confidence items that
+     * were routed to both branches; documents are found through BM25.
      */
     fun searchVector(queryEmbedding: FloatArray, topK: Int = 10): List<SearchHit> {
         val db = readableDatabase
         val scored = mutableListOf<SearchHit>()
 
-        val cursor = db.rawQuery("SELECT item_id, vec FROM embeddings", null)
+        val cursor = db.rawQuery(
+            """
+            SELECT e.item_id, e.vec FROM embeddings e
+            JOIN items i ON i.item_id = e.item_id
+            WHERE i.bucket_pred = 'scene' OR i.routed_both = 1
+            """.trimIndent(),
+            null
+        )
         try {
             while (cursor.moveToNext()) {
                 val itemId = cursor.getString(0)
@@ -327,6 +340,24 @@ class PixarchDatabase(context: Context, dbName: String = "pixarch.db") :
         }
         cursor.close()
         return path
+    }
+
+    /** (bucket_pred, routed_both, has OCR) counts -- for diagnostics and tests. */
+    fun bucketSummary(): Map<String, Int> {
+        val out = LinkedHashMap<String, Int>()
+        readableDatabase.rawQuery(
+            """
+            SELECT i.bucket_pred, i.routed_both, (d.item_id IS NOT NULL) AS has_ocr, COUNT(*)
+            FROM items i LEFT JOIN doc_fields d ON d.item_id = i.item_id
+            GROUP BY 1, 2, 3 ORDER BY 1, 2, 3
+            """.trimIndent(),
+            null
+        ).use { c ->
+            while (c.moveToNext()) {
+                out["${c.getString(0)}|both=${c.getInt(1)}|ocr=${c.getInt(2)}"] = c.getInt(3)
+            }
+        }
+        return out
     }
 
     fun getTotalItemsCount(): Int {

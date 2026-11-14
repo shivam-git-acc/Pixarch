@@ -6,16 +6,19 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
+import androidx.exifinterface.media.ExifInterface
+import com.pixarch.app.core.classify.BucketClassifier
 import com.pixarch.app.core.clip.OnnxClipRunner
 import com.pixarch.app.core.doctype.DocTypeClassifier
 import com.pixarch.app.core.ocr.MlKitOcrEngine
+import com.pixarch.app.core.ocr.TextNormaliser
 import com.pixarch.app.core.storage.ItemRecord
-import com.pixarch.app.core.storage.OcrBlockRecord
 import com.pixarch.app.core.storage.PixarchDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.InputStream
 import java.security.MessageDigest
 import java.util.UUID
 
@@ -27,192 +30,203 @@ data class IndexProgress(
     val error: String? = null
 )
 
+/** One gallery image as MediaStore describes it. */
+data class MediaItem(
+    val uri: Uri,
+    val name: String,
+    val bytes: Long?,
+    val dateTakenMs: Long?,
+    val relativePath: String?
+)
+
+/**
+ * Indexes the gallery the way `scripts/build_index.py` indexes the corpus:
+ *
+ *   hash + dedupe -> CLIP encode -> zero-shot bucket (margin < τ: both branches)
+ *   -> store embedding for every item
+ *   -> OCR -> normalise -> doc-type rules -> FTS5, ONLY for document / hedged items
+ *
+ * Skipping OCR on confident scene photos is where most of the indexing time goes
+ * (OCR was 82% of desktop indexing time).
+ */
 class GalleryIndexer(
     private val context: Context,
     private val database: PixarchDatabase,
     private val ocrEngine: MlKitOcrEngine,
-    private val clipRunner: OnnxClipRunner
+    private val clipRunner: OnnxClipRunner,
+    private val bucketClassifier: BucketClassifier
 ) {
     suspend fun indexMediaStore(
         limit: Int = 100,
         onProgress: (IndexProgress) -> Unit = {}
     ): Int = withContext(Dispatchers.IO) {
-        val resolver: ContentResolver = context.contentResolver
-        val projection = arrayOf(
-            MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.DISPLAY_NAME,
-            MediaStore.Images.Media.SIZE,
-            MediaStore.Images.Media.DATE_ADDED
-        )
-        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
-
-        val imageUris = mutableListOf<Pair<Uri, String>>()
-        resolver.query(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            projection,
-            null,
-            null,
-            sortOrder
-        )?.use { cursor ->
-            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-            while (cursor.moveToNext() && imageUris.size < limit) {
-                val id = cursor.getLong(idColumn)
-                val name = cursor.getString(nameColumn) ?: "image_$id.jpg"
-                val uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-                imageUris.add(uri to name)
-            }
-        }
-
+        val items = queryMediaStore(limit)
         var processed = 0
-        val total = imageUris.size
-
-        for ((index, pair) in imageUris.withIndex()) {
-            val (uri, name) = pair
+        for ((index, item) in items.withIndex()) {
             try {
-                indexSingleImage(uri, name)
-                processed++
+                if (indexSingleImage(item)) processed++
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.w(TAG, "indexing failed for ${item.name}", e)
             }
-            onProgress(
-                IndexProgress(
-                    indexedCount = index + 1,
-                    totalCount = total,
-                    currentItemPath = name
-                )
-            )
+            onProgress(IndexProgress(index + 1, items.size, item.name))
         }
-
-        onProgress(
-            IndexProgress(
-                indexedCount = processed,
-                totalCount = total,
-                currentItemPath = "Complete",
-                isComplete = true
-            )
-        )
+        onProgress(IndexProgress(processed, items.size, "Complete", isComplete = true))
         processed
     }
 
-    suspend fun indexSingleImage(uri: Uri, name: String): Boolean = withContext(Dispatchers.IO) {
-        val resolver = context.contentResolver
-
-        // 1. Calculate SHA-256
-        val sha256 = calculateSha256(resolver, uri) ?: return@withContext false
-
-        // 2. Check deduplication
-        if (database.hasItemWithSha256(sha256)) {
-            return@withContext false
-        }
-
-        // 3. Decode Bitmap with downsampling
-        val bitmap = decodeSampledBitmapFromUri(resolver, uri, maxDimension = 1280)
-            ?: return@withContext false
-
-        val itemId = UUID.randomUUID().toString()
-
-        try {
-            // 4. ML Kit OCR
-            val ocrResult = ocrEngine.extractText(bitmap)
-            val ocrMs = ocrResult.durationMs
-
-            var docType = "none"
-            var docRule: String? = null
-            var fullText = ""
-
-            if (ocrResult.fullText.isNotBlank()) {
-                fullText = ocrResult.fullText
-                val match = DocTypeClassifier.classifyText(fullText)
-                docType = match.docType
-                docRule = match.ruleName
-            }
-
-            // 5. Visual MobileCLIP Embedding (INT8)
-            val embedding = clipRunner.encodeImage(bitmap)
-
-            // 6. Persist to SQLite
-            val item = ItemRecord(
-                itemId = itemId,
-                path = uri.toString(),
-                sha256 = sha256,
-                width = bitmap.width,
-                height = bitmap.height,
-                isScreenshot = name.contains("screenshot", ignoreCase = true),
-                bucketPred = if (docType != "none" && docType != DocTypeClassifier.UNKNOWN) "document" else "scene",
-                bucketConf = 1.0f
-            )
-            database.insertItem(item)
-
-            if (fullText.isNotBlank()) {
-                database.insertDocumentOcr(
-                    itemId = itemId,
-                    fullText = fullText,
-                    rawText = fullText,
-                    docType = docType,
-                    docTypeRule = docRule,
-                    engine = "mlkit",
-                    ocrMs = ocrMs,
-                    blocks = ocrResult.blocks
+    private fun queryMediaStore(limit: Int): List<MediaItem> {
+        val projection = buildList {
+            add(MediaStore.Images.Media._ID)
+            add(MediaStore.Images.Media.DISPLAY_NAME)
+            add(MediaStore.Images.Media.SIZE)
+            add(MediaStore.Images.Media.DATE_TAKEN)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(MediaStore.Images.Media.RELATIVE_PATH)
+        }.toTypedArray()
+        val out = ArrayList<MediaItem>()
+        context.contentResolver.query(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null,
+            "${MediaStore.Images.Media.DATE_ADDED} DESC"
+        )?.use { c ->
+            val idCol = c.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val nameCol = c.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+            val sizeCol = c.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
+            val takenCol = c.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
+            val pathCol = c.getColumnIndex("relative_path")
+            while (c.moveToNext() && out.size < limit) {
+                val id = c.getLong(idCol)
+                out.add(
+                    MediaItem(
+                        uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id),
+                        name = c.getString(nameCol) ?: "image_$id.jpg",
+                        bytes = if (c.isNull(sizeCol)) null else c.getLong(sizeCol),
+                        dateTakenMs = if (c.isNull(takenCol)) null else c.getLong(takenCol).takeIf { it > 0 },
+                        relativePath = if (pathCol >= 0 && !c.isNull(pathCol)) c.getString(pathCol) else null
+                    )
                 )
             }
+        }
+        return out
+    }
 
-            database.insertEmbedding(
-                itemId = itemId,
-                model = "mobileclip2_s0_int8",
-                dim = embedding.size,
-                vector = embedding
+    /** @return true if a new item was indexed (false for duplicates / unreadable files). */
+    suspend fun indexSingleImage(item: MediaItem): Boolean = withContext(Dispatchers.IO) {
+        val resolver = context.contentResolver
+
+        // Stage 0: hash + dedupe, original dimensions, EXIF.
+        val sha256 = calculateSha256(resolver, item.uri) ?: return@withContext false
+        if (database.hasItemWithSha256(sha256)) return@withContext false
+        val (origW, origH) = readBounds(resolver, item.uri) ?: return@withContext false
+        val exif = readExif(resolver, item.uri)
+
+        val bitmap = decodeSampledBitmap(resolver, item.uri, origW, origH, maxDimension = 1280)
+            ?: return@withContext false
+        val itemId = UUID.randomUUID().toString()
+        try {
+            // Stage 1: CLIP encode once; the same embedding classifies and indexes.
+            val embedding = clipRunner.encodeImage(bitmap)
+            val verdict = bucketClassifier.classify(embedding)
+
+            database.insertItem(
+                ItemRecord(
+                    itemId = itemId,
+                    path = item.uri.toString(),
+                    sha256 = sha256,
+                    bytes = item.bytes,
+                    width = origW,
+                    height = origH,
+                    captureDate = item.dateTakenMs?.let { MediaMetadata.formatDateTaken(it) } ?: exif.captureDate,
+                    isScreenshot = MediaMetadata.looksLikeScreenshot(origW, origH, exif.hasCamera, item.relativePath),
+                    bucketPred = verdict.bucket,
+                    bucketConf = verdict.margin,
+                    routedBoth = verdict.routedBoth
+                )
             )
+            // Stage 2b: every embedding is stored; searchVector restricts to scene/hedged.
+            database.insertEmbedding(itemId, "mobileclip2_s0_int8", embedding.size, embedding)
 
+            // Stage 2a: document branch only for document or hedged items.
+            if (verdict.bucket == DOCUMENT || verdict.routedBoth) {
+                try {
+                    val ocr = ocrEngine.extractText(bitmap)
+                    val norm = TextNormaliser.normalise(ocr.fullText)
+                    val match = DocTypeClassifier.classifyText(norm)
+                    database.insertDocumentOcr(
+                        itemId = itemId,
+                        fullText = norm,
+                        rawText = ocr.fullText,
+                        docType = match.docType,
+                        docTypeRule = match.ruleName,
+                        engine = "mlkit-${ocrEngine.mode.name.lowercase()}",
+                        ocrMs = ocr.durationMs,
+                        blocks = ocr.blocks
+                    )
+                } catch (e: Exception) {
+                    // One bad scan must not lose the item: the scene branch still has it.
+                    Log.w(TAG, "OCR failed for ${item.name}", e)
+                }
+            }
             true
         } finally {
             bitmap.recycle()
         }
     }
 
-    private fun calculateSha256(resolver: ContentResolver, uri: Uri): String? {
-        return try {
-            resolver.openInputStream(uri)?.use { stream ->
-                val md = MessageDigest.getInstance("SHA-256")
-                val buffer = ByteArray(8192)
-                var bytesRead: Int
-                while (stream.read(buffer).also { bytesRead = it } != -1) {
-                    md.update(buffer, 0, bytesRead)
-                }
-                md.digest().joinToString("") { "%02x".format(it) }
-            }
-        } catch (e: Exception) {
-            null
-        }
+    private data class Exif(val captureDate: String?, val hasCamera: Boolean)
+
+    private fun readExif(resolver: ContentResolver, uri: Uri): Exif = try {
+        resolver.openInputStream(uri)?.use { stream ->
+            val e = ExifInterface(stream)
+            Exif(
+                captureDate = MediaMetadata.formatExifDate(
+                    e.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL) ?: e.getAttribute(ExifInterface.TAG_DATETIME)
+                ),
+                hasCamera = listOf(ExifInterface.TAG_MAKE, ExifInterface.TAG_MODEL, ExifInterface.TAG_FOCAL_LENGTH)
+                    .any { !e.getAttribute(it).isNullOrBlank() }
+            )
+        } ?: Exif(null, false)
+    } catch (e: Exception) {
+        Exif(null, false) // malformed EXIF is common
     }
 
-    private fun decodeSampledBitmapFromUri(resolver: ContentResolver, uri: Uri, maxDimension: Int): Bitmap? {
-        return try {
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true
+    private fun calculateSha256(resolver: ContentResolver, uri: Uri): String? = try {
+        resolver.openInputStream(uri)?.use { stream ->
+            val md = MessageDigest.getInstance("SHA-256")
+            val buffer = ByteArray(1 shl 16)
+            while (true) {
+                val n = stream.read(buffer)
+                if (n < 0) break
+                md.update(buffer, 0, n)
             }
-            resolver.openInputStream(uri)?.use { stream ->
-                BitmapFactory.decodeStream(stream, null, options)
-            }
-
-            var inSampleSize = 1
-            val (width, height) = options.outWidth to options.outHeight
-            if (width > maxDimension || height > maxDimension) {
-                val max = maxOf(width, height)
-                inSampleSize = Integer.highestOneBit(max / maxDimension)
-                if (inSampleSize < 1) inSampleSize = 1
-            }
-
-            val decodeOptions = BitmapFactory.Options().apply {
-                this.inSampleSize = inSampleSize
-                inPreferredConfig = Bitmap.Config.ARGB_8888
-            }
-
-            resolver.openInputStream(uri)?.use { stream ->
-                BitmapFactory.decodeStream(stream, null, decodeOptions)
-            }
-        } catch (e: Exception) {
-            null
+            md.digest().joinToString("") { "%02x".format(it) }
         }
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun readBounds(resolver: ContentResolver, uri: Uri): Pair<Int, Int>? = try {
+        val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
+        if (opts.outWidth > 0 && opts.outHeight > 0) opts.outWidth to opts.outHeight else null
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun decodeSampledBitmap(
+        resolver: ContentResolver, uri: Uri, width: Int, height: Int, maxDimension: Int
+    ): Bitmap? = try {
+        var inSampleSize = 1
+        while (maxOf(width, height) / (inSampleSize * 2) >= maxDimension) inSampleSize *= 2
+        val opts = BitmapFactory.Options().apply {
+            this.inSampleSize = inSampleSize
+            inPreferredConfig = Bitmap.Config.ARGB_8888
+        }
+        resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
+    } catch (e: Exception) {
+        null
+    }
+
+    companion object {
+        private const val TAG = "GalleryIndexer"
+        const val DOCUMENT = "document"
     }
 }

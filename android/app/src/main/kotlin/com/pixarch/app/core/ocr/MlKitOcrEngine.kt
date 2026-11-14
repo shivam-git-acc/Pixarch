@@ -1,8 +1,12 @@
 package com.pixarch.app.core.ocr
 
 import android.graphics.Bitmap
+import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.TextRecognizer
+import com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.pixarch.app.core.storage.OcrBlockRecord
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -15,48 +19,64 @@ data class OcrResult(
     val durationMs: Float
 )
 
-class MlKitOcrEngine : AutoCloseable {
+/**
+ * ML Kit Text Recognition v2.
+ *
+ * Default [Mode.DEVANAGARI]: that recognizer reads Latin as well, so one pass covers
+ * English and Hindi text. OcrModeComparisonTest, 15 synthetic documents, Galaxy A17
+ * (SM-A176B), 2026-11-14:
+ *
+ *   mode                    latinCER  devanagariRecall  docTypeAcc  ms/img
+ *   LATIN                   0.508     0.000             1.000       370
+ *   DEVANAGARI              0.515     1.000             1.000       475
+ *   LATIN_PLUS_DEVANAGARI   0.508     1.000             1.000       771
+ *
+ * [Mode.LATIN_PLUS_DEVANAGARI] keeps the Latin output plus Devanagari-only blocks from
+ * the second recognizer; it costs 60% more time for no measured gain.
+ */
+class MlKitOcrEngine(val mode: Mode = Mode.DEVANAGARI) : AutoCloseable {
 
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    enum class Mode { LATIN, DEVANAGARI, LATIN_PLUS_DEVANAGARI }
 
-    suspend fun extractText(bitmap: Bitmap): OcrResult = suspendCancellableCoroutine { cont ->
-        val t0 = System.currentTimeMillis()
+    private val latin: TextRecognizer? =
+        if (mode != Mode.DEVANAGARI) TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS) else null
+    private val devanagari: TextRecognizer? =
+        if (mode != Mode.LATIN) TextRecognition.getClient(DevanagariTextRecognizerOptions.Builder().build()) else null
+
+    suspend fun extractText(bitmap: Bitmap): OcrResult {
+        val t0 = System.nanoTime()
         val image = InputImage.fromBitmap(bitmap, 0)
-
-        recognizer.process(image)
-            .addOnSuccessListener { visionText ->
-                val elapsed = (System.currentTimeMillis() - t0).toFloat()
-                val blocks = mutableListOf<OcrBlockRecord>()
-
-                visionText.textBlocks.forEachIndexed { idx, block ->
-                    val box = block.boundingBox
-                    blocks.add(
-                        OcrBlockRecord(
-                            blockIdx = idx,
-                            text = block.text,
-                            conf = null,
-                            x0 = box?.left,
-                            y0 = box?.top,
-                            x1 = box?.right,
-                            y1 = box?.bottom
-                        )
-                    )
-                }
-
-                cont.resume(
-                    OcrResult(
-                        fullText = visionText.text,
-                        blocks = blocks,
-                        durationMs = elapsed
-                    )
-                )
+        val blocks = when (mode) {
+            Mode.LATIN -> latin!!.process(image).await().textBlocks
+            Mode.DEVANAGARI -> devanagari!!.process(image).await().textBlocks
+            Mode.LATIN_PLUS_DEVANAGARI -> {
+                val lat = latin!!.process(image).await().textBlocks
+                val dev = devanagari!!.process(image).await().textBlocks.filter { hasDevanagari(it.text) }
+                lat + dev
             }
-            .addOnFailureListener { exception ->
-                cont.resumeWithException(exception)
-            }
+        }
+        val records = blocks.mapIndexed { idx, block ->
+            val box = block.boundingBox
+            OcrBlockRecord(idx, block.text, conf = null, box?.left, box?.top, box?.right, box?.bottom)
+        }
+        return OcrResult(
+            fullText = records.joinToString("\n") { it.text },
+            blocks = records,
+            durationMs = (System.nanoTime() - t0) / 1e6f
+        )
     }
 
     override fun close() {
-        recognizer.close()
+        latin?.close()
+        devanagari?.close()
+    }
+
+    companion object {
+        fun hasDevanagari(s: String): Boolean = s.any { it in 'ऀ'..'ॿ' }
+
+        private suspend fun Task<Text>.await(): Text = suspendCancellableCoroutine { cont ->
+            addOnSuccessListener { cont.resume(it) }
+            addOnFailureListener { cont.resumeWithException(it) }
+        }
     }
 }

@@ -19,6 +19,7 @@ onnxruntime = "1.18.0"
 workmanager = "2.9.1"
 coil = "2.6.0"
 sqliteAndroid = "3.45.0"
+exifinterface = "1.4.1"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -48,6 +49,7 @@ mlkit-text-recognition-devanagari = { module = "com.google.android.gms:play-serv
 onnxruntime-android = { module = "com.microsoft.onnxruntime:onnxruntime-android", version.ref = "onnxruntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 requery-sqlite-android = { module = "com.github.requery:sqlite-android", version.ref = "sqliteAndroid" }
 
 [plugins]

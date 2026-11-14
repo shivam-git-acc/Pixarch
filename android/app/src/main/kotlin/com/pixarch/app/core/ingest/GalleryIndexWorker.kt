@@ -17,7 +17,8 @@ class GalleryIndexWorker(
             context = applicationContext,
             database = app.database,
             ocrEngine = app.ocrEngine,
-            clipRunner = app.clipRunner
+            clipRunner = app.clipRunner,
+            bucketClassifier = app.bucketClassifier
         )
 
         return try {
@@ -30,6 +31,8 @@ class GalleryIndexWorker(
                     )
                 )
             }
+            // Aggregate counts only (no paths or OCR text) for on-device diagnostics.
+            android.util.Log.i("GalleryIndexWorker", "indexed $processed new items; buckets=${app.database.bucketSummary()}")
             Result.success(workDataOf("processed" to processed))
         } catch (e: Exception) {
             e.printStackTrace()

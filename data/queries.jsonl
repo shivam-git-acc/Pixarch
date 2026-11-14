@@ -1,20 +1,98 @@
-{"query_id":"q001","text":"give me my aadhaar card","gold_route":"document","kind":"doc_lookup","relevant":{"aadhaar":2}}
-{"query_id":"q002","text":"pan card","gold_route":"document","kind":"doc_lookup","relevant":{"pan":2}}
-{"query_id":"q003","text":"show me my passport","gold_route":"document","kind":"doc_lookup","relevant":{"passport":2}}
-{"query_id":"q004","text":"driving licence","gold_route":"document","kind":"doc_lookup","relevant":{"dl":2}}
-{"query_id":"q005","text":"find my receipts","gold_route":"document","kind":"doc_lookup","relevant":{"receipt":2}}
-{"query_id":"q006","text":"tax invoice with gst number","gold_route":"document","kind":"doc_lookup","relevant":{"receipt":2}}
-{"query_id":"q007","text":"government identity document","gold_route":"document","kind":"doc_lookup","relevant":{"aadhaar":2,"pan":2,"passport":2,"dl":2}}
-{"query_id":"q008","text":"total amount paid at the store","gold_route":"document","kind":"doc_lookup","relevant":{"receipt":2}}
-{"query_id":"q009","text":"find a photo of a beach","gold_route":"scene","kind":"scene_search","relevant":{"beach":2}}
-{"query_id":"q010","text":"a photo of mountains","gold_route":"scene","kind":"scene_search","relevant":{"mountain":2}}
-{"query_id":"q011","text":"a forest with trees","gold_route":"scene","kind":"scene_search","relevant":{"trees":2}}
-{"query_id":"q012","text":"parked cars","gold_route":"scene","kind":"scene_search","relevant":{"vehicle":2}}
-{"query_id":"q013","text":"people at a party","gold_route":"scene","kind":"scene_search","relevant":{"party":2}}
-{"query_id":"q014","text":"college campus","gold_route":"scene","kind":"scene_search","relevant":{"college":2}}
-{"query_id":"q015","text":"a photo of food","gold_route":"scene","kind":"scene_search","relevant":{"food":2}}
-{"query_id":"q016","text":"a walk in the park","gold_route":"scene","kind":"scene_search","relevant":{"travel":2}}
-{"query_id":"q017","text":"gym workout","gold_route":"scene","kind":"scene_search","relevant":{"fitness":2}}
-{"query_id":"q018","text":"inside a shopping mall","gold_route":"scene","kind":"scene_search","relevant":{"mall":2}}
-{"query_id":"q019","text":"my card","gold_route":"document","kind":"ambiguous","relevant":{"aadhaar":1,"pan":1,"dl":1}}
-{"query_id":"q020","text":"that thing from last december","gold_route":"document","kind":"ambiguous","relevant":{}}
+{"query_id": "q001", "text": "give me my aadhaar card", "gold_route": "document", "kind": "doc_lookup", "relevant": {"aadhaar": 2}}
+{"query_id": "q002", "text": "pan card", "gold_route": "document", "kind": "doc_lookup", "relevant": {"pan": 2}}
+{"query_id": "q003", "text": "show me my passport", "gold_route": "document", "kind": "doc_lookup", "relevant": {"passport": 2}}
+{"query_id": "q004", "text": "driving licence", "gold_route": "document", "kind": "doc_lookup", "relevant": {"dl": 2}}
+{"query_id": "q005", "text": "find my receipts", "gold_route": "document", "kind": "doc_lookup", "relevant": {"receipt": 2}}
+{"query_id": "q006", "text": "tax invoice with gst number", "gold_route": "document", "kind": "doc_lookup", "relevant": {"receipt": 2}}
+{"query_id": "q007", "text": "government identity document", "gold_route": "document", "kind": "doc_lookup", "relevant": {"aadhaar": 2, "pan": 2, "passport": 2, "dl": 2}}
+{"query_id": "q008", "text": "total amount paid at the store", "gold_route": "document", "kind": "doc_lookup", "relevant": {"receipt": 2}}
+{"query_id": "q009", "text": "find a photo of a beach", "gold_route": "scene", "kind": "scene_search", "relevant": {"beach": 2}}
+{"query_id": "q010", "text": "a photo of mountains", "gold_route": "scene", "kind": "scene_search", "relevant": {"mountain": 2}}
+{"query_id": "q011", "text": "a forest with trees", "gold_route": "scene", "kind": "scene_search", "relevant": {"trees": 2}}
+{"query_id": "q012", "text": "parked cars", "gold_route": "scene", "kind": "scene_search", "relevant": {"vehicle": 2}}
+{"query_id": "q013", "text": "people at a party", "gold_route": "scene", "kind": "scene_search", "relevant": {"party": 2}}
+{"query_id": "q014", "text": "college campus", "gold_route": "scene", "kind": "scene_search", "relevant": {"college": 2}}
+{"query_id": "q015", "text": "a photo of food", "gold_route": "scene", "kind": "scene_search", "relevant": {"food": 2}}
+{"query_id": "q016", "text": "a walk in the park", "gold_route": "scene", "kind": "scene_search", "relevant": {"travel": 2}}
+{"query_id": "q017", "text": "gym workout", "gold_route": "scene", "kind": "scene_search", "relevant": {"fitness": 2}}
+{"query_id": "q018", "text": "inside a shopping mall", "gold_route": "scene", "kind": "scene_search", "relevant": {"mall": 2}}
+{"query_id": "q019", "text": "my card", "gold_route": "document", "kind": "ambiguous", "relevant": {"credit_card": 2, "debit_card": 2, "aadhaar": 1, "pan": 1, "dl": 1}}
+{"query_id": "q020", "text": "that thing from last december", "gold_route": "document", "kind": "ambiguous", "relevant": {}}
+{"query_id": "q021", "text": "aadhaar number", "gold_route": "document", "kind": "doc_lookup", "relevant": {"aadhaar": 2}}
+{"query_id": "q022", "text": "unique identification authority card", "gold_route": "document", "kind": "doc_lookup", "relevant": {"aadhaar": 2}}
+{"query_id": "q023", "text": "permanent account number", "gold_route": "document", "kind": "doc_lookup", "relevant": {"pan": 2}}
+{"query_id": "q024", "text": "income tax department card", "gold_route": "document", "kind": "doc_lookup", "relevant": {"pan": 2}}
+{"query_id": "q025", "text": "passport number and date of expiry", "gold_route": "document", "kind": "doc_lookup", "relevant": {"passport": 2}}
+{"query_id": "q026", "text": "republic of india travel document", "gold_route": "document", "kind": "doc_lookup", "relevant": {"passport": 2}}
+{"query_id": "q027", "text": "my driving license validity", "gold_route": "document", "kind": "doc_lookup", "relevant": {"dl": 2}}
+{"query_id": "q028", "text": "transport department licence", "gold_route": "document", "kind": "doc_lookup", "relevant": {"dl": 2}}
+{"query_id": "q029", "text": "invoice from the seller", "gold_route": "document", "kind": "doc_lookup", "relevant": {"bill": 2}}
+{"query_id": "q030", "text": "my bills", "gold_route": "document", "kind": "doc_lookup", "relevant": {"bill": 2}}
+{"query_id": "q031", "text": "invoice number and amount due", "gold_route": "document", "kind": "doc_lookup", "relevant": {"bill": 2}}
+{"query_id": "q032", "text": "a page from a book", "gold_route": "document", "kind": "doc_lookup", "relevant": {"book": 2}}
+{"query_id": "q033", "text": "book title page", "gold_route": "document", "kind": "doc_lookup", "relevant": {"book": 2}}
+{"query_id": "q034", "text": "scanned book with author and publisher", "gold_route": "document", "kind": "doc_lookup", "relevant": {"book": 2}}
+{"query_id": "q035", "text": "a scanned form", "gold_route": "document", "kind": "doc_lookup", "relevant": {"general_doc": 2}}
+{"query_id": "q036", "text": "official form with filled fields", "gold_route": "document", "kind": "doc_lookup", "relevant": {"general_doc": 2}}
+{"query_id": "q037", "text": "a printed document page", "gold_route": "document", "kind": "doc_lookup", "relevant": {"general_doc": 2}}
+{"query_id": "q038", "text": "handwritten notes", "gold_route": "document", "kind": "doc_lookup", "relevant": {"handwritten": 2}}
+{"query_id": "q039", "text": "my handwriting", "gold_route": "document", "kind": "doc_lookup", "relevant": {"handwritten": 2}}
+{"query_id": "q040", "text": "notes written by hand", "gold_route": "document", "kind": "doc_lookup", "relevant": {"handwritten": 2}}
+{"query_id": "q041", "text": "my credit card", "gold_route": "document", "kind": "doc_lookup", "relevant": {"credit_card": 2}}
+{"query_id": "q042", "text": "credit card number", "gold_route": "document", "kind": "doc_lookup", "relevant": {"credit_card": 2}}
+{"query_id": "q043", "text": "card valid thru date", "gold_route": "document", "kind": "doc_lookup", "relevant": {"credit_card": 2}}
+{"query_id": "q044", "text": "my debit card", "gold_route": "document", "kind": "doc_lookup", "relevant": {"debit_card": 2}}
+{"query_id": "q045", "text": "debit card details", "gold_route": "document", "kind": "doc_lookup", "relevant": {"debit_card": 2}}
+{"query_id": "q046", "text": "atm card", "gold_route": "document", "kind": "doc_lookup", "relevant": {"debit_card": 2}}
+{"query_id": "q047", "text": "bank passbook", "gold_route": "document", "kind": "doc_lookup", "relevant": {"passbook": 2}}
+{"query_id": "q048", "text": "savings account passbook", "gold_route": "document", "kind": "doc_lookup", "relevant": {"passbook": 2}}
+{"query_id": "q049", "text": "passbook with transactions", "gold_route": "document", "kind": "doc_lookup", "relevant": {"passbook": 2}}
+{"query_id": "q050", "text": "bank statement", "gold_route": "document", "kind": "doc_lookup", "relevant": {"bank_statement": 2}}
+{"query_id": "q051", "text": "statement of account", "gold_route": "document", "kind": "doc_lookup", "relevant": {"bank_statement": 2}}
+{"query_id": "q052", "text": "my account transactions", "gold_route": "document", "kind": "doc_lookup", "relevant": {"bank_statement": 2}}
+{"query_id": "q053", "text": "school report card", "gold_route": "document", "kind": "doc_lookup", "relevant": {"report_card": 2}}
+{"query_id": "q054", "text": "my marks and grades", "gold_route": "document", "kind": "doc_lookup", "relevant": {"report_card": 2}}
+{"query_id": "q055", "text": "progress report from school", "gold_route": "document", "kind": "doc_lookup", "relevant": {"report_card": 2}}
+{"query_id": "q056", "text": "sea and sand", "gold_route": "scene", "kind": "scene_search", "relevant": {"beach": 2}}
+{"query_id": "q057", "text": "seaside holiday photo", "gold_route": "scene", "kind": "scene_search", "relevant": {"beach": 2}}
+{"query_id": "q058", "text": "snowy peaks", "gold_route": "scene", "kind": "scene_search", "relevant": {"mountain": 2}}
+{"query_id": "q059", "text": "hills landscape", "gold_route": "scene", "kind": "scene_search", "relevant": {"mountain": 2}}
+{"query_id": "q060", "text": "woods", "gold_route": "scene", "kind": "scene_search", "relevant": {"trees": 2}}
+{"query_id": "q061", "text": "green forest photo", "gold_route": "scene", "kind": "scene_search", "relevant": {"trees": 2}}
+{"query_id": "q062", "text": "cars in a parking lot", "gold_route": "scene", "kind": "scene_search", "relevant": {"vehicle": 2}}
+{"query_id": "q063", "text": "photo of vehicles", "gold_route": "scene", "kind": "scene_search", "relevant": {"vehicle": 2}}
+{"query_id": "q064", "text": "celebration with friends", "gold_route": "scene", "kind": "scene_search", "relevant": {"party": 2}}
+{"query_id": "q065", "text": "nightclub photo", "gold_route": "scene", "kind": "scene_search", "relevant": {"party": 2}}
+{"query_id": "q066", "text": "university buildings", "gold_route": "scene", "kind": "scene_search", "relevant": {"college": 2}}
+{"query_id": "q067", "text": "students on campus", "gold_route": "scene", "kind": "scene_search", "relevant": {"college": 2}}
+{"query_id": "q068", "text": "a meal on a plate", "gold_route": "scene", "kind": "scene_search", "relevant": {"food": 2}}
+{"query_id": "q069", "text": "restaurant food", "gold_route": "scene", "kind": "scene_search", "relevant": {"food": 2}}
+{"query_id": "q070", "text": "outdoor park photo", "gold_route": "scene", "kind": "scene_search", "relevant": {"travel": 2}}
+{"query_id": "q071", "text": "garden pathway", "gold_route": "scene", "kind": "scene_search", "relevant": {"travel": 2}}
+{"query_id": "q072", "text": "exercise equipment", "gold_route": "scene", "kind": "scene_search", "relevant": {"fitness": 2}}
+{"query_id": "q073", "text": "people training indoors", "gold_route": "scene", "kind": "scene_search", "relevant": {"fitness": 2}}
+{"query_id": "q074", "text": "shopping centre interior", "gold_route": "scene", "kind": "scene_search", "relevant": {"mall": 2}}
+{"query_id": "q075", "text": "shops inside a building", "gold_route": "scene", "kind": "scene_search", "relevant": {"mall": 2}}
+{"query_id": "q076", "text": "wedding photos", "gold_route": "scene", "kind": "scene_search", "relevant": {"wedding": 2}}
+{"query_id": "q077", "text": "marriage ceremony", "gold_route": "scene", "kind": "scene_search", "relevant": {"wedding": 2}}
+{"query_id": "q078", "text": "reception hall celebration", "gold_route": "scene", "kind": "scene_search", "relevant": {"wedding": 2}}
+{"query_id": "q079", "text": "photo of an aeroplane", "gold_route": "scene", "kind": "scene_search", "relevant": {"planes": 2}}
+{"query_id": "q080", "text": "aircraft on the runway", "gold_route": "scene", "kind": "scene_search", "relevant": {"planes": 2}}
+{"query_id": "q081", "text": "airport with planes", "gold_route": "scene", "kind": "scene_search", "relevant": {"planes": 2}}
+{"query_id": "q082", "text": "playing sports outside", "gold_route": "scene", "kind": "scene_search", "relevant": {"outdoor_games": 2}}
+{"query_id": "q083", "text": "a sports ground", "gold_route": "scene", "kind": "scene_search", "relevant": {"outdoor_games": 2}}
+{"query_id": "q084", "text": "athletic field photo", "gold_route": "scene", "kind": "scene_search", "relevant": {"outdoor_games": 2}}
+{"query_id": "q085", "text": "clothing store", "gold_route": "scene", "kind": "scene_search", "relevant": {"clothes": 2}}
+{"query_id": "q086", "text": "clothes on racks", "gold_route": "scene", "kind": "scene_search", "relevant": {"clothes": 2}}
+{"query_id": "q087", "text": "shopping for garments", "gold_route": "scene", "kind": "scene_search", "relevant": {"clothes": 2}}
+{"query_id": "q088", "text": "paintings in a gallery", "gold_route": "scene", "kind": "scene_search", "relevant": {"art": 2}}
+{"query_id": "q089", "text": "art exhibition", "gold_route": "scene", "kind": "scene_search", "relevant": {"art": 2}}
+{"query_id": "q090", "text": "artwork on display", "gold_route": "scene", "kind": "scene_search", "relevant": {"art": 2}}
+{"query_id": "q091", "text": "railway station platform", "gold_route": "scene", "kind": "scene_search", "relevant": {"transit_hub": 2}}
+{"query_id": "q092", "text": "waiting at the train station", "gold_route": "scene", "kind": "scene_search", "relevant": {"transit_hub": 2}}
+{"query_id": "q093", "text": "airport terminal", "gold_route": "scene", "kind": "scene_search", "relevant": {"transit_hub": 2}}
+{"query_id": "q094", "text": "chest x-ray", "gold_route": "scene", "kind": "scene_search", "relevant": {"xray": 2}}
+{"query_id": "q095", "text": "my radiograph", "gold_route": "scene", "kind": "scene_search", "relevant": {"xray": 2}}
+{"query_id": "q096", "text": "medical x-ray image", "gold_route": "scene", "kind": "scene_search", "relevant": {"xray": 2}}
+{"query_id": "q097", "text": "my bank documents", "gold_route": "document", "kind": "ambiguous", "relevant": {"passbook": 2, "bank_statement": 2, "bill": 1}}
+{"query_id": "q098", "text": "payment card", "gold_route": "document", "kind": "ambiguous", "relevant": {"credit_card": 2, "debit_card": 2}}

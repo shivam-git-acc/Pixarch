@@ -31,15 +31,23 @@ raw similarity: CLIP's absolute scores are not comparable across images, but
 the gap between two buckets for one image is usable. Below the threshold an
 item is indexed into **both** branches rather than guessed.
 
-## OCR: EasyOCR by default, behind an `OCREngine` protocol
+## OCR: Tesseract by default, behind an `OCREngine` protocol
 
 The note names Google ML Kit Text Recognition v2, which is Android-only. On
 desktop the engine must provide Latin **and** Devanagari.
 
-Tesseract needs the `tesseract-ocr` system package and this environment has no
-passwordless sudo, so EasyOCR is the default: pip-installable, supports `en`
-and `hi`, and runs on the GPU already present. Tesseract remains implemented as
-the comparator for whoever can install it.
+EasyOCR was the original default because Tesseract needs the `tesseract-ocr`
+system package and the environment then had no passwordless sudo. That
+constraint no longer holds -- `tesseract-ocr` with `eng+hin` is installed -- so
+`configs/baseline.yaml` sets `engine: tesseract` and every reported number
+comes from it. EasyOCR remains implemented as the comparator.
+
+The two were measured head to head on the document corpus and tied on subtype
+accuracy while failing on *disjoint* documents, so neither dominates. That
+comparison, and the image-preprocessing sweeps run alongside it, are
+exploratory and deliberately excluded from the baseline report: the baseline is
+a single-engine floor, and folding in a best-of-two OCR stage would make it
+something else.
 
 All engines sit behind `OCREngine.extract(path) -> list[TextBlock]`, so the
 Android build swaps in ML Kit by changing `ocr.engine` in the config. The

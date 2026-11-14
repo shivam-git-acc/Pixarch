@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import json
 import sqlite3
+import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Callable
@@ -47,40 +48,174 @@ def filename_search(conn: sqlite3.Connection, query: str, top_k: int) -> list[Hi
     return [Hit(item_id=r["item_id"], score=1.0, branch="filename") for r in rows]
 
 
-def build_systems(engine: SearchEngine, conn: sqlite3.Connection, top_k: int) -> dict[str, Callable]:
-    """The baseline plus its three required comparators."""
+def build_systems(engine: SearchEngine, conn: sqlite3.Connection, depth: int) -> dict[str, Callable]:
+    """The baseline plus its three required comparators.
+
+    Each returns (ranked_ids, elapsed_ms, branch) so query latency is captured
+    from the same pass the metrics come from -- no second timing run.
+    """
+    def _routed(q):
+        r = engine.search(q, depth)
+        return r.ranked_ids, r.elapsed_ms, r.route.branch
+
+    def _forced(branch):
+        def inner(q):
+            r = engine.search(q, depth, force_branch=branch)
+            return r.ranked_ids, r.elapsed_ms, branch
+        return inner
+
+    def _filename(q):
+        start = time.perf_counter()
+        hits = filename_search(conn, q, depth)
+        return [h.item_id for h in hits], (time.perf_counter() - start) * 1000.0, "filename"
+
     return {
         # The baseline: router picks exactly one branch.
-        "routed": lambda q: engine.search(q, top_k).ranked_ids,
+        "routed": _routed,
         # Single-model comparators -- do these make routing look worthwhile?
-        "clip_only": lambda q: engine.search(q, top_k, force_branch=SCENE).ranked_ids,
-        "bm25_only": lambda q: engine.search(q, top_k, force_branch=DOCUMENT).ranked_ids,
+        "clip_only": _forced(SCENE),
+        "bm25_only": _forced(DOCUMENT),
         # The trivial floor.
-        "filename": lambda q: [h.item_id for h in filename_search(conn, q, top_k)],
+        "filename": _filename,
     }
 
 
-def run_eval(engine: SearchEngine, conn: sqlite3.Connection, queries, qrels, k_values, top_k):
-    """Return per-system metrics overall and split by query kind."""
-    systems = build_systems(engine, conn, top_k)
+def run_eval(engine: SearchEngine, conn: sqlite3.Connection, queries, qrels, k_values,
+             top_k, depth: int | None = None):
+    """Per-system metrics, split by query kind and by bucket, plus latencies.
+
+    `depth` is the retrieval depth used for scoring and defaults to at least
+    the largest relevant set in the qrels. R-precision needs the ranking to run
+    R deep, and with 20 items per subtype a top_k of 10 would silently cap it
+    at 0.5 -- reintroducing the very ceiling artefact the metric exists to
+    avoid. Prefix metrics (p@1, recall@10, ...) are unaffected by the extra
+    depth, so one deeper pass serves every metric.
+    """
+    max_r = max((len(v) for v in qrels.values()), default=0)
+    depth = depth or max(top_k, max_r, max(k_values))
+    systems = build_systems(engine, conn, depth)
     results: dict[str, dict] = {}
     runs: dict[str, dict[str, list[str]]] = {}
+    latencies: dict[str, list[tuple[str, float]]] = {}
+
+    # Bucket comes from each query's gold_route: the document/scene split the
+    # report asks for. Kind (doc_lookup/scene_search/ambiguous) is kept too.
+    groups: dict[str, dict[str, list[str]]] = {"kind": defaultdict(list),
+                                               "bucket": defaultdict(list)}
+    for q in queries:
+        groups["kind"][q["kind"]].append(q["query_id"])
+        groups["bucket"][q["gold_route"]].append(q["query_id"])
 
     for name, fn in systems.items():
-        run = {q["query_id"]: fn(q["text"]) for q in queries}
+        run: dict[str, list[str]] = {}
+        lat: list[tuple[str, float]] = []
+        for q in queries:
+            ranked, ms, branch = fn(q["text"])
+            run[q["query_id"]] = ranked
+            lat.append((branch, ms))
         runs[name] = run
+        latencies[name] = lat
         results[name] = {"overall": evaluate_run(run, qrels, k_values)}
 
-        by_kind: dict[str, list[str]] = defaultdict(list)
-        for q in queries:
-            by_kind[q["kind"]].append(q["query_id"])
-        for kind, qids in by_kind.items():
-            subset = {qid: run[qid] for qid in qids}
-            sub_qrels = {qid: qrels[qid] for qid in qids if qid in qrels}
-            if sub_qrels:
-                results[name][kind] = evaluate_run(subset, sub_qrels, k_values)
+        for grouping in groups.values():
+            for label, qids in grouping.items():
+                sub_qrels = {qid: qrels[qid] for qid in qids if qid in qrels}
+                if sub_qrels:
+                    subset = {qid: run[qid] for qid in qids}
+                    results[name][label] = evaluate_run(subset, sub_qrels, k_values)
 
-    return results, runs
+        # Macro-average across buckets, stated explicitly: each bucket counts
+        # once regardless of how many queries it holds. Micro-averaging would
+        # silently weight whichever bucket has more queries.
+        bucket_blocks = [results[name][b] for b in groups["bucket"] if b in results[name]]
+        if bucket_blocks:
+            keys = {k for b in bucket_blocks for k in b if k != "n_queries"}
+            results[name]["bucket_macro"] = {
+                k: sum(b.get(k, 0.0) for b in bucket_blocks) / len(bucket_blocks) for k in keys
+            }
+            results[name]["bucket_macro"]["n_queries"] = sum(
+                b.get("n_queries", 0) for b in bucket_blocks)
+
+    return results, runs, latencies, depth
+
+
+def latency_report(latencies: dict[str, list[tuple[str, float]]]) -> dict[str, dict]:
+    """Mean/p50/p95 per system, and per branch within the routed system.
+
+    The two branches are bimodal -- BM25 is a SQL query, CLIP needs a text
+    encoder forward pass -- so a single mean hides the distribution that the
+    on-device latency claim actually rests on.
+    """
+    def stats(xs: list[float]) -> dict[str, float]:
+        if not xs:
+            return {}
+        s = sorted(xs)
+        pick = lambda p: s[min(len(s) - 1, int(round(p * (len(s) - 1))))]  # noqa: E731
+        return {"n": float(len(s)), "mean_ms": sum(s) / len(s), "p50_ms": pick(0.50),
+                "p95_ms": pick(0.95), "max_ms": s[-1]}
+
+    out: dict[str, dict] = {}
+    for name, rows in latencies.items():
+        out[name] = {"all": stats([ms for _, ms in rows])}
+        by_branch: dict[str, list[float]] = defaultdict(list)
+        for branch, ms in rows:
+            by_branch[branch].append(ms)
+        for branch, xs in by_branch.items():
+            out[name][branch] = stats(xs)
+    return out
+
+
+def doctype_benchmark(conn: sqlite3.Connection) -> dict:
+    """Accuracy of `doctype.py` -- gold_subtype vs the tagged doc_type.
+
+    This module drives the FTS column weighted 5x against body text, which the
+    design notes credit for making document lookup reliable, and it has never
+    had a benchmark. Per-class P/R/F1 plus the rule that fired, so a
+    misclassification is attributable to a specific rule rather than to "OCR".
+    """
+    rows = conn.execute(
+        "SELECT i.item_id, i.gold_subtype, i.origin, f.doc_type, f.doc_type_rule "
+        "FROM items i JOIN doc_fields f ON f.item_id = i.item_id "
+        "WHERE i.gold_bucket = 'document'"
+    ).fetchall()
+    if not rows:
+        return {}
+
+    pairs = [(r["gold_subtype"], r["doc_type"] or "unknown") for r in rows]
+    labels = sorted({g for g, _ in pairs} | {p for _, p in pairs})
+    confusion: dict[tuple[str, str], int] = defaultdict(int)
+    for g, p in pairs:
+        confusion[(g, p)] += 1
+
+    per_class: dict[str, dict[str, float]] = {}
+    for lab in labels:
+        tp = confusion[(lab, lab)]
+        fp = sum(c for (g, p), c in confusion.items() if p == lab and g != lab)
+        fn = sum(c for (g, p), c in confusion.items() if g == lab and p != lab)
+        prec = tp / (tp + fp) if tp + fp else 0.0
+        rec = tp / (tp + fn) if tp + fn else 0.0
+        f1 = 2 * prec * rec / (prec + rec) if prec + rec else 0.0
+        support = sum(c for (g, _), c in confusion.items() if g == lab)
+        if support or tp or fp:
+            per_class[lab] = {"precision": prec, "recall": rec, "f1": f1,
+                              "support": float(support)}
+
+    correct = sum(c for (g, p), c in confusion.items() if g == p)
+    rule_counts: dict[str, int] = defaultdict(int)
+    for r in rows:
+        rule_counts[r["doc_type_rule"] or "(none)"] += 1
+
+    # Synthetic documents are rendered text, so they are the easy half; the
+    # fetched ones are photographs and scans. Splitting keeps the headline
+    # number honest.
+    by_origin: dict[str, dict[str, float]] = {}
+    for origin in {r["origin"] for r in rows}:
+        sub = [r for r in rows if r["origin"] == origin]
+        hit = sum(1 for r in sub if r["gold_subtype"] == (r["doc_type"] or "unknown"))
+        by_origin[origin] = {"n": float(len(sub)), "accuracy": hit / len(sub)}
+
+    return {"n": len(rows), "accuracy": correct / len(rows), "per_class": per_class,
+            "confusion": dict(confusion), "rules": dict(rule_counts), "by_origin": by_origin}
 
 
 def routing_accuracy(engine: SearchEngine, queries) -> tuple[float, list[tuple[str, str, str]]]:

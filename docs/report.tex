@@ -1,0 +1,554 @@
+% Pixarch -- Baseline Report
+% Compile:  tectonic docs/report.tex      (or: pdflatex docs/report.tex, twice)
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath}   % \text inside math mode
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+% [table] pulls in colortbl, which provides \cellcolor (used by the caveat box).
+\usepackage[table]{xcolor}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+% Long monospace filenames (IMG_20231205_123456.jpg) cannot hyphenate by
+% default and run into the margin; [htt] permits breaking inside \texttt.
+\usepackage[htt]{hyphenat}
+\usepackage[hidelinks,colorlinks=true,linkcolor=linknavy,urlcolor=linknavy,
+            citecolor=linknavy]{hyperref}
+
+\definecolor{linknavy}{HTML}{1F4E79}
+\definecolor{rulegrey}{HTML}{CCCCCC}
+\definecolor{boxbg}{HTML}{F4F6F8}
+
+% Callout box for caveats, built from primitives so no extra package is needed.
+\newenvironment{caveat}
+  {\par\vspace{0.6em}\noindent
+   \begin{tabular}{@{}p{0.4em}@{\hspace{0.8em}}p{\dimexpr\linewidth-2.2em\relax}@{}}
+   \cellcolor{linknavy}\rule{0pt}{1em} &}
+  {\end{tabular}\par\vspace{0.6em}}
+
+\newcommand{\code}[1]{\texttt{\small #1}}
+\newcommand{\best}[1]{\textbf{#1}}
+
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.18}
+
+\title{\vspace{-1.4cm}\textbf{Pixarch --- Baseline Report}\\[0.35em]
+       \large On-device agentic retrieval over personal data}
+\author{}
+\date{31 October 2026}
+
+\begin{document}
+\maketitle
+\vspace{-0.9cm}
+
+\noindent\rule{\linewidth}{0.4pt}
+\vspace{0.4em}
+
+\noindent
+This report covers the \textbf{baseline}: the non-agentic, single-shot system
+that every later contribution is measured against. All numbers come from
+\code{docs/results/baseline\_2026-10-31.md}, which \code{scripts/evaluate.py}
+regenerates from scratch.
+
+\begin{caveat}
+\textbf{Status: indicative, not publishable.} Relevance is single-judge and part
+of the corpus is generated. The numbers are good enough to catch regressions and
+to size the on-device problem; they are not good enough to support a claim.
+\end{caveat}
+
+\noindent\rule{\linewidth}{0.4pt}
+
+\tableofcontents
+\vspace{0.6em}
+\noindent\rule{\linewidth}{0.4pt}
+
+%======================================================================
+\section{Labeled Dataset Creation}
+
+No dataset exists for mixed personal-archive search, so we built one. The corpus
+grew from 127 items to \textbf{629 manifest rows / 627 indexed} across
+\textbf{31 subtypes} --- 14 document, 17 scene.
+
+\code{data/raw/} is gitignored while \code{data/manifest.csv} is committed,
+carrying \code{source\_url}, \code{license} and \code{attribution} per row, so the
+corpus is reproducible \emph{by reference} rather than by redistributing images.
+\code{scripts/fetch\_dataset.py} rebuilds it.
+
+\subsection{Sources}
+
+\begin{longtable}{@{}p{1.8cm}p{6.6cm}p{4.4cm}p{2.6cm}@{}}
+\toprule
+\textbf{Bucket} & \textbf{Subtypes} & \textbf{Source} & \textbf{Licence} \\
+\midrule
+\endhead
+scene & beach, mountain, trees, vehicle, party, wedding, college, food, travel,
+        fitness, mall, planes, outdoor\_games, clothes, art, transit\_hub
+      & SUN397 (via HuggingFace) & research use \\
+scene & xray & keremberke/chest-xray-classification & CC-BY-4.0 \\
+document & receipt & ICDAR-2019 SROIE & CC-BY-4.0 \\
+document & bill & katanaml-org/invoices-donut-data-v1 & CC-BY-4.0 \\
+document & general\_doc & FUNSD & research use \\
+document & handwritten & IAM Handwriting Database & research use \\
+document & book & Wikimedia Commons title pages & PD / CC \\
+document & aadhaar, pan, dl, passport, credit\_card, debit\_card, passbook,
+           bank\_statement, report\_card
+         & \textbf{synthetic} (generated) & CC0 \\
+\bottomrule
+\end{longtable}
+
+\subsection{Why nine classes are synthetic}
+
+Wikimedia Commons holds \textbf{nine} usable Indian identity specimens in total
+--- verified by search, not assumed. Beyond those, every image of an Aadhaar
+card, PAN card, passport, licence, bank passbook or payment card on the open web
+is a photograph of a \textbf{real person's} document, carrying their name,
+address, photograph and the number itself.
+
+This is not merely a privacy preference; it is a property of the repository.
+\code{manifest.csv} is committed and stores \code{source\_url}, and
+\code{fetch\_dataset.py} reconstructs the corpus from it. Fetching such images
+would publish a permanent, public index of real people's identity documents and
+cause everyone who clones the repository to re-download them. India's Aadhaar
+Act 2016 additionally restricts the sharing of identity information. Building the
+evaluation set would be worse still: OCR ground truth would mean transcribing
+real Aadhaar numbers into a committed file.
+
+Generation avoids all of this and produces \emph{better} data: exact ground
+truth, balanced classes (21 PAN instead of 1), and controllable difficulty.
+
+\paragraph{Safety properties of the generated values.}
+\begin{itemize}[leftmargin=1.3em,itemsep=0.15em]
+  \item Aadhaar numbers begin with \textbf{0 or 1} --- UIDAI never issues those,
+        so no generated number can collide with a real one.
+  \item Card numbers are constructed to \textbf{fail the Luhn checksum}, so none
+        can be a valid payment card.
+  \item All person, bank and school names are fictional.
+\end{itemize}
+
+There is deliberately \textbf{no ``SPECIMEN'' watermark}. A token appearing in
+every synthetic document and no real one is a label leak straight into BM25 ---
+the same defect as the filename leak that \code{schema.sql} documents removing
+(worth $+0.125$ p@1, measured, then deleted).
+
+The nine real Commons specimens are kept at their original indices and excluded
+from the synthetic pool, so they remain a held-out realism check.
+
+\subsection{Handwriting}
+
+Every page-level handwriting dataset on HuggingFace is gated. Only line-level
+sets are reachable, and a raw IAM line is ${\sim}2467\times128$ --- a 19:1 strip
+that is neither a note a user would photograph nor anything CLIP can route
+sensibly. Pages are therefore \textbf{composed from real IAM handwriting lines}:
+the pixels are real, only the layout is ours, and the ground truth is the
+concatenated line text.
+
+\subsection{Ground truth and judgements}
+
+\begin{center}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+\textbf{Artifact} & \textbf{Contents} & \textbf{Before} & \textbf{After} \\
+\midrule
+\code{ocr\_groundtruth.jsonl} & character-exact + upstream transcriptions & 20 & \best{260} \\
+\code{queries.jsonl}          & $\geq 3$ per subtype, all 31 covered      & 20 & \best{98}  \\
+\code{qrels.csv}              & judgements, expanded by subtype           & 185 & \best{2{,}183} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\code{scripts/make\_qrels.py} now fails loudly if any corpus subtype has no
+query --- the check that would have caught half the corpus becoming unevaluable
+when the subtype count went $15 \rightarrow 31$.
+
+%======================================================================
+\section{Models used for PC simulation}
+
+\begin{center}
+\begin{tabular}{@{}p{5.2cm}p{4.6cm}p{5.6cm}@{}}
+\toprule
+\textbf{Role} & \textbf{Model} & \textbf{Footprint} \\
+\midrule
+Scene embedding + bucket routing & CLIP \code{ViT-B-32} / \code{laion2b\_s34b\_b79k}
+  & \textbf{151.3\,M params} --- 605\,MB fp32, 303\,MB fp16, 151\,MB int8 \\
+OCR & Tesseract 5, \code{eng+hin} & system package \\
+Lexical index & SQLite FTS5 + BM25 & in-index, no model \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+One CLIP instance serves \textbf{two} jobs --- zero-shot bucket classification at
+ingestion and scene retrieval at query time --- which halves what the on-device
+build must budget for.
+
+Tesseract is the engine behind every number in this report. EasyOCR remains
+implemented behind the same protocol as a comparator but is not used here.
+
+%======================================================================
+\section{Finalized models for the edge device}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Stage} & \textbf{Desktop} & \textbf{Android} \\
+\midrule
+OCR       & Tesseract \code{eng+hin} & \textbf{ML Kit Text Recognition v2} (Latin + Devanagari) \\
+Embedding & CLIP ViT-B-32 fp32       & same weights, fp16 / int8 \\
+Index     & SQLite FTS5              & SQLite FTS5 (ships with Android) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+All engines sit behind \code{OCREngine.extract(path) -> list[TextBlock]}, so the
+Android build swaps OCR by changing one configuration key. FTS5 was chosen partly
+because it is present on Android unchanged.
+
+\paragraph{Budget implied by the measurements.}
+CLIP at int8 is ${\sim}151$\,MB resident, and the index projects to 85\,MB for a
+10{,}000-item gallery (\S\ref{sec:storage}). Ingestion is the real constraint:
+1.56 hours for 10{,}000 items on a desktop GPU, which is why the architecture
+assumes heavy processing runs while the phone is idle and charging.
+
+%======================================================================
+\section{Baseline Architecture}
+
+\begin{center}
+\begin{BVerbatim}
+image --> ingest (hash, EXIF) --> (1) CLIP zero-shot classify
+                                        |
+                        +---------------+---------------+
+                   document                          scene
+                        |                               |
+              OCR -> doctype rules            CLIP image embedding
+                        |                               |
+            FTS5 inverted index                   vector store
+                        |                               |
+                      BM25                           cosine
+\end{BVerbatim}
+\end{center}
+
+At query time a \textbf{rule-first router} picks exactly one branch; CLIP
+prototype similarity is consulted only when the keyword rules abstain. Everything
+lands in a single \code{index.db}.
+
+\paragraph{Deliberately absent.}
+Each of the following is a later contribution that must not be pre-empted by the
+baseline it will be measured against: no score fusion, no agentic loop, no retry
+or clarification, no face branch.
+
+\paragraph{Two choices the measurements justify.}
+\begin{itemize}[leftmargin=1.3em,itemsep=0.2em]
+  \item \code{doc\_type} is its own FTS column \textbf{weighted $5\times$} against
+        body text. Raw BM25 over OCR text is brittle when a scan is noisy and the
+        one distinguishing phrase comes back mangled.
+  \item \textbf{No filename column.} Indexing generated names leaked the class
+        label into the ranking --- worth $+0.125$ p@1, measured, then removed.
+\end{itemize}
+
+%======================================================================
+\section{Results}
+
+Corpus 627 items $\cdot$ 98 queries $\cdot$ retrieval depth 107 $\cdot$ CLIP on
+CUDA $\cdot$ Tesseract.
+
+\subsection{Retrieval}
+
+\begin{center}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+\textbf{System} & \textbf{p@1} & \textbf{p@5} & \textbf{MRR@10} & \textbf{nDCG@10}
+  & \textbf{R-prec} & \textbf{recall@10} \\
+\midrule
+\textbf{routed (baseline)} & \best{0.773} & \best{0.781} & \best{0.803} & \best{0.773} & \best{0.693} & 0.369 \\
+clip\_only  & 0.629 & 0.596 & 0.644 & 0.580 & 0.478 & 0.278 \\
+bm25\_only  & 0.361 & 0.355 & 0.378 & 0.349 & 0.312 & 0.157 \\
+filename    & 0.299 & 0.299 & 0.299 & 0.299 & 0.298 & 0.140 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Routing beats both single-model comparators overall: \textbf{+0.144 p@1} over
+CLIP-only and \textbf{+0.412} over BM25-only.
+
+\paragraph{Per bucket.}
+Macro-averaged \emph{within} each bucket over its queries, then macro-averaged
+\emph{across} buckets so each counts once regardless of query count.
+
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{System} & \textbf{document p@1} & \textbf{scene p@1} & \textbf{macro p@1} \\
+\midrule
+routed     & 0.739 & 0.804 & \best{0.772} \\
+clip\_only & 0.370 & \best{0.863} & 0.616 \\
+bm25\_only & \best{0.739} & 0.020 & 0.379 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The honest reading: routing's value is that it is \emph{never catastrophic}. Each
+single-model system collapses on the bucket it was not built for --- BM25 scores
+0.020 on scenes, CLIP 0.370 on documents --- while routing tracks the better of
+the two everywhere. On scenes alone CLIP-only is \emph{better} than routed
+(0.863 vs 0.804), because every routing error is a pure loss.
+
+\subsection{Recall with ceilings}
+
+Recall@$k$ cannot exceed $k/|\text{relevant}|$. With ${\sim}20$ items per subtype
+recall@10 caps at 0.48, so the raw figure badly understates performance.
+
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{System} & \textbf{recall@10} & \textbf{ceiling@10} & \textbf{\% of achievable} \\
+\midrule
+routed     & 0.369 & 0.480 & \best{77.0\%} \\
+clip\_only & 0.278 & 0.480 & 57.9\% \\
+bm25\_only & 0.157 & 0.480 & 32.7\% \\
+filename   & 0.140 & 0.480 & 29.2\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+R-precision --- self-normalising, with no ceiling artefact --- tells the same
+story: \textbf{0.693} for routed against 0.478 for CLIP-only.
+
+\subsection{Module benchmarks}
+\label{sec:modules}
+
+\paragraph{Bucket classification (CLIP zero-shot, ingestion).}
+618/627 $=$ \textbf{98.6\%}. Eight scene $\rightarrow$ document, one
+document $\rightarrow$ scene.
+
+\paragraph{Query routing (rules, then CLIP).}
+\textbf{95.9\%} --- 4 of 98 misrouted. Three are the x-ray queries: the router
+has no radiography vocabulary, so CLIP decides, and a chest film reads as ``a
+scanned document''. The fourth is the intentionally unanswerable \code{q020}.
+
+\paragraph{Document subtype tagging (\code{doctype.py}) --- 70.7\% over 287
+documents.} This module had never been measured.
+
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Origin} & \textbf{n} & \textbf{Accuracy} \\
+\midrule
+synthetic & 180 & \best{100.0\%} \\
+fetched   & 107 & \best{21.5\%} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{@{}lrp{8.6cm}@{}}
+\toprule
+\textbf{Misclassification} & \textbf{n} & \textbf{Cause} \\
+\midrule
+bill $\rightarrow$ receipt & 20 & invoices carry ``total''/``invoice no''; no rule distinguishes them from receipts \\
+book $\rightarrow$ unknown & 20 & \code{book-isbn} needs isbn/chapter/copyright; title pages have none \\
+handwritten $\rightarrow$ unknown & 20 & no rule exists, and OCR on handwriting is weak \\
+general\_doc $\rightarrow$ unknown/receipt & 20 & generic forms have no distinguishing vocabulary \\
+aadhaar/pan/passport $\rightarrow$ unknown & 4 & OCR failed to recover the key phrase \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The $100\%$ / $21.5\%$ split is the headline: the rules are effectively
+\emph{perfect on rendered text and poor on photographs}, so the aggregate
+$70.7\%$ is an artefact of the synthetic:fetched ratio rather than a property of
+the module. \code{receipt} precision of 0.391 --- recall 1.000, but 20 bills and
+8 forms swept in --- is the clearest single defect.
+
+\paragraph{OCR accuracy (Tesseract, 258 items with ground truth).}
+
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{Set} & \textbf{n} & \textbf{CER} & \textbf{WER} \\
+\midrule
+all                  & 258 & 0.471 & 0.596 \\
+excluding \code{bill}& 238 & \best{0.420} & \best{0.527} \\
+synthetic            & 180 & 0.418 & 0.507 \\
+fetched              &  78 & 0.592 & 0.801 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{caveat}
+\code{bill} is \textbf{not comparable}. The upstream invoice ground truth is a
+set of extracted \emph{field values}, not a page transcription, so OCR that
+correctly reads the whole page is scored against a much shorter reference and its
+CER exceeds 1.0. This is a ground-truth mismatch, not an OCR failure.
+\end{caveat}
+
+The synthetic-versus-fetched gap (0.418 vs 0.592 CER) quantifies the domain gap
+the generated corpus carries: rendered text is roughly 30\% easier than
+photographs and scans. The best subtype is \code{passbook} (0.187); the worst
+comparable one is \code{bank\_statement} (0.655).
+
+\subsection{Query latency}
+
+\begin{center}
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+\textbf{System} & \textbf{Scope} & \textbf{n} & \textbf{mean} & \textbf{p50}
+  & \textbf{p95} & \textbf{max} \\
+\midrule
+routed     & all      & 98 & 8.0\,ms  & 6.8  & 13.5 & 63.3 \\
+routed     & document & 49 & \best{4.1\,ms} & 1.6 & 8.5 & 46.9 \\
+routed     & scene    & 49 & \best{11.9\,ms} & 12.4 & 15.2 & 63.3 \\
+bm25\_only & ---      & 98 & 0.6\,ms  & 0.4  & 1.5  & 2.2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The branches are bimodal by an order of magnitude: BM25 is a SQL query
+(0.6\,ms), while the scene branch pays a CLIP text-encoder forward pass
+(11.9\,ms). Both sit far below interactive thresholds --- \textbf{query time is
+not the on-device constraint}.
+
+\subsection{Ingestion throughput}
+
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{Stage} & \textbf{Items} & \textbf{ms/image} & \textbf{images/sec} \\
+\midrule
+ingest        & 627 & 29.1  & 34.41 \\
+clip\_encode  & 627 & 43.2  & 23.14 \\
+classify      & 627 & 26.9  & 37.22 \\
+embed\_store  & 627 & 0.2   & 4209.58 \\
+\textbf{ocr}  & 393 & \best{738.0} & \best{1.35} \\
+\midrule
+\textbf{end-to-end} & 627 & \best{562.0} & \best{1.78} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Stages run over different denominators: \code{ocr} touches 393 items (287
+documents plus 106 low-confidence items routed to both branches) while the rest
+touch all 627. A single ms/image averaged across stages would be meaningless.
+
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Bucket} & \textbf{ms/image} & \textbf{images/sec} \\
+\midrule
+scene    & 99.4   & 10.06 \\
+document & 1110.0 & 0.90 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{OCR is 82\% of total indexing time} and makes documents ${\sim}11\times$
+more expensive than scenes, so mixed-gallery throughput depends entirely on the
+document:scene mix.
+
+Per-item OCR is long-tailed --- mean 691\,ms, p50 478\,ms, \textbf{p95
+1567\,ms}, \textbf{max 3048\,ms} --- so the mean understates the worst case by
+roughly $4\times$.
+
+\begin{center}
+\fcolorbox{rulegrey}{boxbg}{%
+\begin{minipage}{0.92\linewidth}
+\vspace{0.3em}
+\centering \textbf{Projected: 1.56 hours to index a 10{,}000-item gallery} at
+this corpus's 46\% document ratio (linear projection, desktop GPU).
+\vspace{0.3em}
+\end{minipage}}
+\end{center}
+
+\subsection{Storage and memory}
+\label{sec:storage}
+
+\code{index.db} is \textbf{5.3\,MB} for 627 items.
+
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Component} & \textbf{MB} & \textbf{Share} \\
+\midrule
+embeddings                 & 2.58 & 48.3\% \\
+ocr\_blocks (+ autoindex)  & 1.54 & 28.9\% \\
+doc\_fields                & 0.39 & 7.4\% \\
+doc\_fts (inverted index)  & 0.36 & 6.7\% \\
+items                      & 0.25 & 4.7\% \\
+\bottomrule
+\end{tabular}
+\hspace{0.8em}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Measure} & \textbf{Bytes} \\
+\midrule
+per item, overall                      & 8{,}525 \\
+per item, shared (row + CLIP vector)   & 5{,}840 \\
+extra per document (OCR + FTS)         & 5{,}866 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Projected index for 10{,}000 items:}
+85\,MB at this corpus's ratio; 58\,MB all scene; 117\,MB all document. With CLIP
+at int8 ($\sim$151\,MB resident), the whole system fits comfortably inside a
+mid-range phone's budget --- the storage claim holds.
+
+%======================================================================
+\section{Repository}
+
+\begin{Verbatim}[fontsize=\small,frame=single,framesep=6pt,rulecolor=\color{rulegrey}]
+pip install -r requirements.txt
+python scripts/fetch_dataset.py --per-class 20 --per-doc 20   # rebuild corpus
+python scripts/make_qrels.py                                  # queries -> qrels
+python scripts/build_index.py                                 # ingest + OCR + CLIP
+python scripts/evaluate.py                                    # -> docs/results/
+python app/demo.py                                            # Gradio UI
+pytest                                                        # 94 tests
+\end{Verbatim}
+
+\begin{center}
+\begin{tabular}{@{}p{7.1cm}p{7.9cm}@{}}
+\toprule
+\textbf{Path} & \textbf{Contents} \\
+\midrule
+\code{src/pixarch/\{ingest,\allowbreak classify,\allowbreak ocr,\allowbreak doctype\}.py} & ingestion pipeline \\
+\code{src/pixarch/synthetic.py}  & synthetic specimen generation \\
+\code{src/pixarch/store/}        & SQLite schema, FTS5, vector store \\
+\code{src/pixarch/query/}        & router, BM25, CLIP search \\
+\code{src/pixarch/eval/}         & metrics, module benchmarks, resource accounting \\
+\code{configs/baseline.yaml}     & every tunable \\
+\code{docs/design-decisions.md}  & why each choice, and the traps hit \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%======================================================================
+\section{Known limitations}
+
+\begin{enumerate}[leftmargin=1.5em,itemsep=0.35em]
+  \item \textbf{Relevance is single-judge} and declared by subtype rather than
+        per item. The proposal calls for multi-judge agreement; that is
+        outstanding.
+  \item \textbf{The \code{filename} comparator is inflated.} The fetcher names
+        files after their class (\code{scn\_beach\_020.jpg}), so path matching
+        succeeds far more often than on a phone, where names look like
+        \code{IMG\_20231205\_123456.jpg}. Treat 0.299 p@1 as a loose upper bound
+        on the trivial floor, not the real floor.
+  \item \textbf{\code{doctype} rules do not cover \code{bill}, \code{book},
+        \code{handwritten} or \code{general\_doc}} --- 72 of 287 documents are
+        mistagged. The rules were written when those classes had no data.
+  \item \textbf{No screenshots}, though the proposal names them as a gap in
+        existing benchmarks (20--40\% of a real gallery). Deferred.
+  \item \textbf{Synthetic documents are rendered, not photographed.} The
+        0.418 vs 0.592 CER gap bounds the optimism this introduces; the nine
+        held-out real specimens are the check.
+  \item \textbf{X-ray queries misroute} and handwriting retrieval fails
+        outright --- both visible in \S\ref{sec:modules}, neither yet addressed.
+\end{enumerate}
+
+\end{document}

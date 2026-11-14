@@ -57,6 +57,20 @@ def main() -> int:
         print("  ! subtypes absent from the corpus (deferred to curation):")
         for qid, st in unmatched:
             print(f"      {qid}: {st}")
+
+    # The inverse check. The warning above catches a query naming a subtype that
+    # does not exist; this catches a subtype that exists but no query reaches --
+    # those items are silently unevaluable, which is how half the corpus became
+    # invisible when the subtype count went 15 -> 31.
+    queried = {st for q in queries for st in (q.get("relevant") or {})}
+    uncovered = sorted(set(by_subtype) - queried)
+    if uncovered:
+        print(f"  ! {len(uncovered)} subtype(s) in the corpus that NO query covers "
+              f"-- their items can never be scored:")
+        for st in uncovered:
+            print(f"      {st} ({len(by_subtype[st])} items)")
+    else:
+        print(f"  all {len(by_subtype)} corpus subtypes are covered by at least one query")
     return 0
 
 

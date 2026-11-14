@@ -27,6 +27,33 @@ def reciprocal_rank(ranked: Sequence[str], relevant: Mapping[str, int], k: int) 
     return 0.0
 
 
+def recall_ceiling_at_k(relevant: Mapping[str, int], k: int) -> float:
+    """The largest recall@k attainable for this query.
+
+    Recall@k cannot exceed k/|relevant|. With 20 items per subtype, recall@1
+    tops out at 0.05 and recall@10 at 0.50, so a raw recall@10 of 0.48 is 96%
+    of what is achievable -- not a failure. Reporting the ceiling alongside is
+    what keeps that readable.
+    """
+    positives = {i for i, g in relevant.items() if g > 0}
+    if not positives:
+        return 0.0
+    return min(k, len(positives)) / len(positives)
+
+
+def r_precision(ranked: Sequence[str], relevant: Mapping[str, int]) -> float:
+    """Precision at R, where R = |relevant| for this query.
+
+    Self-normalising: it has no ceiling artefact, so unlike recall@k it stays
+    comparable as the corpus grows.
+    """
+    positives = {i for i, g in relevant.items() if g > 0}
+    if not positives:
+        return 0.0
+    r = len(positives)
+    return sum(1 for i in ranked[:r] if i in positives) / r
+
+
 def dcg(gains: Sequence[float]) -> float:
     return sum(g / math.log2(i + 2) for i, g in enumerate(gains))
 
@@ -51,6 +78,10 @@ def evaluate_run(
     out: dict[str, float] = {}
     for k in k_values:
         out[f"recall@{k}"] = sum(recall_at_k(run[q], qrels[q], k) for q in judged) / len(judged)
+        # The attainable maximum, and how much of it was actually reached.
+        ceil = sum(recall_ceiling_at_k(qrels[q], k) for q in judged) / len(judged)
+        out[f"ceiling@{k}"] = ceil
+        out[f"recall@{k}_pct_of_max"] = (out[f"recall@{k}"] / ceil) if ceil > 0 else 0.0
         # Precision matters here because recall saturates: a scene query has 10
         # relevant items, so recall@k can never exceed k/10 and recall@1=0.10
         # is the ceiling, not a failure.
@@ -58,5 +89,6 @@ def evaluate_run(
         out[f"ndcg@{k}"] = sum(ndcg_at_k(run[q], qrels[q], k) for q in judged) / len(judged)
     max_k = max(k_values)
     out[f"mrr@{max_k}"] = sum(reciprocal_rank(run[q], qrels[q], max_k) for q in judged) / len(judged)
+    out["r_precision"] = sum(r_precision(run[q], qrels[q]) for q in judged) / len(judged)
     out["n_queries"] = float(len(judged))
     return out

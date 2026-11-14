@@ -84,3 +84,48 @@ def evaluate_ocr(conn: sqlite3.Connection, gt_path: Path) -> dict[str, float]:
         "wer": sum(wers) / len(wers),
         "engine": engine,
     }
+
+
+def evaluate_ocr_grouped(conn: sqlite3.Connection, gt_path: Path) -> dict:
+    """CER/WER split by origin and by subtype.
+
+    The origin split is dataset validation rather than a model result: the
+    synthetic specimens are rendered text and the fetched ones are photographs
+    and scans, so a single pooled CER would be dominated by whichever group is
+    larger. The gap between the two is the domain gap the synthetic corpus
+    carries, and the real Wikimedia ID specimens -- held out at their original
+    indices -- are what it is measured against.
+    """
+    from ..ocr import normalise
+
+    truth = load_ground_truth(gt_path)
+    if not truth:
+        return {}
+
+    rows = conn.execute(
+        "SELECT f.item_id, f.full_text, f.engine, i.origin, i.gold_subtype "
+        "FROM doc_fields f JOIN items i ON i.item_id = f.item_id"
+    ).fetchall()
+
+    buckets: dict[tuple[str, str], list[tuple[float, float]]] = {}
+    for row in rows:
+        reference = truth.get(row["item_id"])
+        if reference is None:
+            continue
+        ref_norm = normalise(reference)
+        cer = error_rate(ref_norm, row["full_text"], by_word=False)
+        wer = error_rate(ref_norm, row["full_text"], by_word=True)
+        buckets.setdefault(("origin", row["origin"] or "?"), []).append((cer, wer))
+        buckets.setdefault(("subtype", row["gold_subtype"] or "?"), []).append((cer, wer))
+
+    def summarise(pairs):
+        return {"n": float(len(pairs)),
+                "cer": sum(c for c, _ in pairs) / len(pairs),
+                "wer": sum(w for _, w in pairs) / len(pairs)}
+
+    out: dict[str, dict] = {"by_origin": {}, "by_subtype": {}}
+    for (kind, label), pairs in buckets.items():
+        if pairs:
+            out["by_origin" if kind == "origin" else "by_subtype"][label] = summarise(pairs)
+    out["by_subtype"] = dict(sorted(out["by_subtype"].items(), key=lambda kv: -kv[1]["cer"]))
+    return out

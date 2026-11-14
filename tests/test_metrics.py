@@ -2,7 +2,8 @@
 import math
 
 from pixarch.eval.metrics import (
-    dcg, ndcg_at_k, precision_at_k, recall_at_k, reciprocal_rank, evaluate_run,
+    dcg, ndcg_at_k, precision_at_k, r_precision, recall_at_k, recall_ceiling_at_k,
+    reciprocal_rank, evaluate_run,
 )
 
 QRELS = {"a": 2, "b": 1, "c": 0}
@@ -70,3 +71,32 @@ def test_precision_is_reported_and_recall_saturates():
     assert got["p@5"] == 1.0
     assert got["recall@1"] == 0.1     # also perfect, but reads as failure
     assert got["recall@5"] == 0.5
+
+
+# --- recall ceilings and R-precision ---------------------------------------
+def test_recall_ceiling_caps_at_k_over_relevant():
+    """20 relevant items means recall@10 can never exceed 0.5."""
+    rel = {f"i{n}": 2 for n in range(20)}
+    assert recall_ceiling_at_k(rel, 10) == 0.5
+    assert recall_ceiling_at_k(rel, 1) == 0.05
+    # k beyond the relevant set is capped at 1.0, not >1.
+    assert recall_ceiling_at_k(rel, 50) == 1.0
+    assert recall_ceiling_at_k({}, 10) == 0.0
+
+
+def test_recall_pct_of_max_reads_as_full_credit_when_ceiling_is_hit():
+    """A perfect ranking scores 1.0 of achievable even though recall@10 is 0.5."""
+    rel = {f"i{n}": 2 for n in range(20)}
+    ranked = [f"i{n}" for n in range(20)]
+    out = evaluate_run({"q": ranked}, {"q": rel}, k_values=(10,))
+    assert out["recall@10"] == 0.5
+    assert out["ceiling@10"] == 0.5
+    assert out["recall@10_pct_of_max"] == 1.0
+
+
+def test_r_precision_uses_relevant_set_size_as_cutoff():
+    rel = {"a": 2, "b": 2, "c": 2, "d": 2}
+    assert r_precision(["a", "b", "c", "d", "z"], rel) == 1.0
+    assert r_precision(["a", "b", "z", "y", "c"], rel) == 0.5
+    assert r_precision(["z", "y", "x", "w"], rel) == 0.0
+    assert r_precision(["a"], {}) == 0.0
